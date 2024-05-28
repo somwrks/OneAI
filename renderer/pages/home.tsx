@@ -2,34 +2,20 @@ import React from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
 import Image from 'next/image'
+import Chat from "../components/Chat"
 
 export default function HomePage() {
   return (
     <React.Fragment>
       <Head>
-        <title>Home - Nextron (with-tailwindcss)</title>
+        <title>OneAI</title>
       </Head>
-      <div className="grid grid-col-1 text-2xl w-full text-center">
-        <div>
-          <Image
-            className="ml-auto mr-auto"
-            src="/images/logo.png"
-            alt="Logo image"
-            width={256}
-            height={256}
-          />
-        </div>
-        <span>⚡ Electron ⚡</span>
-        <span>+</span>
-        <span>Next.js</span>
-        <span>+</span>
-        <span>tailwindcss</span>
-        <span>=</span>
-        <span>💕 </span>
+    <div className="flex flex-col w-full min-h-screen items-center p-5">
+      <div>
+        <h1 className='text-3xl font-bold text-center'>OneAI - AI At Ease</h1>
       </div>
-      <div className="mt-1 w-full flex-wrap flex justify-center">
-        <Link href="/next">Go to next page</Link>
-      </div>
+      <Chat/>
+    </div>
     </React.Fragment>
   )
 }

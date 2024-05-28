@@ -1,5 +1,5 @@
 import path from 'path'
-import { app, ipcMain } from 'electron'
+import { app, ipcMain, shell } from 'electron'
 import serve from 'electron-serve'
 import { createWindow } from './helpers'
 
@@ -21,7 +21,10 @@ if (isProd) {
       preload: path.join(__dirname, 'preload.js'),
     },
   })
-
+  // mainWindow.webContents.setWindowOpenHandler((details) => {
+  //   shell.openExternal(details.url); // Open URL in user's browser.
+  //   return { action: "deny" }; // Prevent the app from opening the URL.
+  // })
   if (isProd) {
     await mainWindow.loadURL('app://./home')
   } else {
