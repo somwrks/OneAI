@@ -6,36 +6,37 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import LlamaAI from 'llamaai';
 
 
-const chatHistoryFile = path.join(process.cwd(), "chat_history.txt");
-
-const readChatHistory = (): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    fs.readFile(chatHistoryFile, "utf8", (err, data) => {
-      if (err) {
-        if (err.code === "ENOENT") {
-          resolve("");
-        } else {
-          reject(err);
-        }
-      } else {
-        resolve(data);
-      }
-    });
-  });
-};
-
-const writeChatHistory = (newChatHistory: string): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    fs.writeFile(chatHistoryFile, newChatHistory, "utf8", (err) => {
-      if (err) reject(err);
-      else resolve();
-    });
-  });
-};
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const { model } = req.query;
-  const { prompt } = req.body;
+  const { prompt,part,template } = req.body;
+  const chatHistoryFile = path.join(process.cwd(), `${prompt.title}.txt`);
+  
+  const readChatHistory = (): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      fs.readFile(chatHistoryFile, "utf8", (err, data) => {
+        if (err) {
+          if (err.code === "ENOENT") {
+            resolve("");
+          } else {
+            reject(err);
+          }
+        } else {
+          resolve(data);
+        }
+      });
+    });
+  };
+  
+  const writeChatHistory = (newChatHistory: string): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      fs.writeFile(chatHistoryFile, newChatHistory, "utf8", (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+  };
+
   
   if (req.method === "POST") {
     try {
