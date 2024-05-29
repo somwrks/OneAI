@@ -63,10 +63,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             const prompt = fullPrompt;
           
             response = await genAI.getGenerativeModel({ model: "gemini-1.5-flash"}).generateContent(prompt);
-            console.log(response)
             result = await response.response;
             result = result.text();
-            console.log(result)
           break;
       
         default:
@@ -74,7 +72,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       }
 
 
-      const newChatHistory = `${chatHistory}\nMe: ${prompt}\nYou: ${result}`;
+      const newChatHistory = `${chatHistory.replace("\n","")}\nMe: ${prompt.replace("\n","")}\nYou: ${result.replace("\n","")}\n`;
 
       await writeChatHistory(newChatHistory);
 
