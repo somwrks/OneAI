@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import { OpenAI } from "openai";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import LlamaAI from 'llamaai';
 
 
 const chatHistoryFile = path.join(process.cwd(), "chat_history.txt");
@@ -66,6 +67,17 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             result = await response.response;
             result = result.text();
           break;
+          case "llama3-70b":
+            const llamaAPI = new LlamaAI({ apiKey: process.env.LLAMA_API_KEY });
+
+          response = await llamaAPI.generate({
+            model: "llama3-70b",
+            prompt: fullPrompt,
+            maxTokens: 150,
+          });
+          result = response.data.text;
+          break;
+
       
         default:
           break;

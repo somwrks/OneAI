@@ -1,0 +1,34 @@
+[
+  {
+    "headings": [
+      {
+        "title": "# Title",
+        "description": "This project focuses on implementing a deep learning model for classifying toxic comments using the Jigsaw Toxic Comment Classification dataset. The model is built using TensorFlow and Keras, with an LSTM-based architecture."
+      },
+      {
+        "title": "## Overview",
+        "description": "The project consists of the following components:\n1. `jigsaw-toxic-comment-classification-challenge/train.csv`: The dataset file containing the training data.\n2. `train.csv`: A copy of the dataset file.\n3. `main.ipynb`: A Jupyter Notebook containing the main code for data preprocessing, model building, training, and evaluation.\n4. `toxicity.h5`: The saved model weights after training."
+      },
+      {
+        "title": "## Dependencies",
+        "description": "The project requires the following dependencies:\n- NumPy\n- Pandas\n- TensorFlow\n- Keras\n- Matplotlib\n- Gradio"
+      },
+      {
+        "title": "## Usage",
+        "description": "1. Ensure all dependencies are installed.\n2. Run the `main.ipynb` notebook in a Jupyter environment.\n3. Follow the instructions and code within the notebook to preprocess the data, build and train the model, evaluate its performance, and interact with the model using the Gradio interface."
+      },
+      {
+        "title": "## Code Structure",
+        "description": "The key components of the code include:\n- Loading and preprocessing the dataset\n- Building an LSTM-based model with Embedding, Bidirectional LSTM, and Dense layers\n- Training the model on the dataset\n- Evaluating the model's performance using metrics like Precision, Recall, and Accuracy\n- Saving and loading the trained model weights\n- Creating a Gradio interface for interactive model inference"
+      },
+      {
+        "title": "## Folder Structure",
+        "description": "- `jigsaw-toxic-comment-classification-challenge`: Contains the dataset file `train.csv`."
+      },
+      {
+        "title": "## License",
+        "description": "This project is licensed under the [MIT License](https://opensource.org/licenses/MIT). Feel free to modify and distribute the code as per the terms of the license."
+      }
+    ]
+  }
+]
