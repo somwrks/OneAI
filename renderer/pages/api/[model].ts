@@ -53,7 +53,7 @@ Use the project details and file list to create an accurate and detailed descrip
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const { model } = req.query;
-  const { prompt, part, template } = req.body;
+  const { prompt,apiKey, part, template } = req.body;
   const projectDir = path.resolve(process.cwd(), prompt.directory);
   if (req.method === "POST") {
     try {
@@ -65,7 +65,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       switch (model) {
         case "gpt-3.5-turbo":
           const openai = new OpenAI({
-            apiKey: process.env.OPENAI_API_KEY,
+            apiKey: apiKey,
           });
 
           response = await openai.chat.completions.create({
@@ -77,7 +77,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           break;
 
         case "gemini-1.5-flash":
-          const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+          const genAI = new GoogleGenerativeAI(apiKey);
           response = await genAI
             .getGenerativeModel({ model: "gemini-1.5-flash" })
             .generateContent(fullPrompt);

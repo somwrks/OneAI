@@ -78,30 +78,32 @@ const ChatPage: React.FC = () => {
           setReadme(data);
         }
       } else {
-        console.error("Wrong response from server");
+        alert("Wrong response from server");
       }
     } catch (error) {
-      console.error("Error while sending question:", error);
+      alert("Error while sending question:"+error);
     }
   };
+  const [apiKey, setApiKey] = useState("")
   const handleSave = async () => {
     console.log(readme)
     try {
       const response = await fetch(`/api/savefile`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ readme: readme }),
+        body: JSON.stringify({ data: readme, dir: prompt.directory,title:prompt.title }),
       });
 
       if (response.ok) {
        
       } else {
-        console.error("Wrong response from server");
+        alert("Wrong response from server");
       }
     } catch (error) {
-      console.error("Error while sending question:", error);
+      alert("Error while sending question:"+error);
     }
   };
+  
 
   useEffect(() => {
     if (Generate) {
@@ -117,6 +119,7 @@ const ChatPage: React.FC = () => {
           prompt,
           part: text.title,
           template: templates[template],
+          apiKey:apiKey
         };
 
         try {
@@ -130,12 +133,12 @@ const ChatPage: React.FC = () => {
     setRegenerate(true)
             const data = await response.json();
           } else {
-            console.error("Failed to send question, Status:", response.status);
+            alert("Failed to send question, Status:"+response.status);
             const errorData = await response.json();
-            console.error("Error Details:", errorData); // Log error details
+            alert("Error Details:"+errorData); 
           }
         } catch (error) {
-          console.error("Error while sending question:", error);
+          alert("Error while sending question:"+error);
         }
       })
     );
@@ -151,10 +154,11 @@ const ChatPage: React.FC = () => {
           value={selectedModel}
           onChange={handleModelChange}
         >
-          <option disabled value="gpt-3.5-turbo">
-            OpenAI
+          <option  value="gpt-3.5-turbo">
+          gpt-3.5-turbo
           </option>
-          <option value="gemini-1.5-flash">Gemini</option>
+          <option value="gemini-1.5-flash">gemini-1.5-flash</option>
+          <option  value="llama3-70b">llama3-70b</option>
           <option disabled value="perplexity">
             Perplexity
           </option>
@@ -164,8 +168,18 @@ const ChatPage: React.FC = () => {
           <option disabled value="gooseai">
             GooseAI
           </option>
-          <option value="llama3-70b">LLama</option>
+         
         </select>
+        <input
+                  className="bg-gray-700 w-2/3 p-3"
+                  type="text"
+                  placeholder="Enter API KEY"
+                  value={apiKey}
+                  disabled={!Generate&&regenerate}
+                  onChange={(e) =>
+                    setApiKey(e.target.value)
+                  }
+                />
         <div className="flex flex-col w-2/3 items-center gap-y-5">
           {start ? (
             <>
@@ -221,7 +235,7 @@ const ChatPage: React.FC = () => {
                               >
                                 {regenerate ? "Regenrate" : "Generate"}
                               </button>
-                              {Generate&&<button
+                              {!Generate&&regenerate&&<button
                                 className="p-3 bg-gray-500 w-1/5 rounded-md"
                                 onClick={handleSave}
                               >
@@ -240,7 +254,7 @@ const ChatPage: React.FC = () => {
             </>
           ) : (
             <>
-              <div className="flex-col flex gap-y-4 text-blue-800 text-xl">
+              <div className="flex-col w-full flex gap-y-4 text-blue-800 text-xl">
                 <input
                   className="p-2"
                   type="text"
@@ -286,6 +300,7 @@ const ChatPage: React.FC = () => {
                     setPrompt({ ...prompt, directory: e.target.value })
                   }
                 />
+              
               </div>
               {Object.values(prompt).every((value) => value.trim() !== "") && (
                 <button
