@@ -63,7 +63,6 @@ The key components of the code include:
 ## Folder Structure
 
 - `.git`: Contains version control information for the project.
-- `chat_history.txt`: Stores the chat history between the user and the AI models.
 - `electron-builder.yml`: Configuration file for Electron Builder, used to package the application for different platforms.
 - `main`: Contains the main process code for the Electron application.
     - `background.ts`: Handles background tasks and communication with the renderer process.

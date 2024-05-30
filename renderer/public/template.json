@@ -26,6 +26,10 @@
         "description": "- `jigsaw-toxic-comment-classification-challenge`: Contains the dataset file `train.csv`."
       },
       {
+        "title": "## How to Contribute",
+        "description": "Contributions to this project are welcome! If you have any suggestions, improvements, or bug fixes, please feel free to create issues or pull requests."
+      },
+      {
         "title": "## License",
         "description": "This project is licensed under the [MIT License](https://opensource.org/licenses/MIT). Feel free to modify and distribute the code as per the terms of the license."
       }
