@@ -12,7 +12,7 @@ import '../styles/globals.css'
 function MyApp({ Component, pageProps }: AppProps) {
   
 return(
-   <ClerkProvider >
+   <ClerkProvider publishableKey='pk_test_dW5pcXVlLWdvYmxpbi04Mi5jbGVyay5hY2NvdW50cy5kZXYk'>
       <SignedOut>
         <html>
           <body>
