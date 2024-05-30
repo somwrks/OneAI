@@ -1,11 +1,18 @@
+![image](https://github.com/somwrks/OneAI/assets/85481905/eb2b22c7-b074-4b51-88d9-a0a69c64ac00)
+![image](https://github.com/somwrks/OneAI/assets/85481905/a3d80b79-6a2c-4acc-ad79-ed74b905aa1f)
+![image](https://github.com/somwrks/OneAI/assets/85481905/8c7cefc5-ab0e-4083-b038-ec7d4fd710b6)
+![image](https://github.com/somwrks/OneAI/assets/85481905/2bccd5d8-dd0f-4e7c-8e5f-a414d31ccc5a)
+![image](https://github.com/somwrks/OneAI/assets/85481905/6fffb256-b5fe-4523-aa23-fc07d2c297b6)
+![image](https://github.com/somwrks/OneAI/assets/85481905/db18e542-0c62-415c-8baa-b45ca2109bca)
+
 # OneAI
 
-This is a desktop application where user can select from various ai models such as Openai, Llama, Gemini, Claude, Perplexity,  upon entering their apikeys, user can provide directory to their project, user can select from various templates present for readme then ai would do the job to build the readme out of it for the project, user can save the readme file on their computer aswell. The application is built using NextronJS, ElectronJS, TailwindCSS and utilizes APIs from Openai, Gemini, Claude, Llama and Perplexity to generate README files. 
+This is a desktop application where user can login in a secured environment to select from various ai models such as Openai, Llama, Gemini, Claude, Perplexity,  upon entering their apikeys, user can provide directory to their project, user can select from various templates present for readme then ai would do the job to build the readme out of it for the project, user can save the readme file on their computer aswell. The application is built using NextronJS, ElectronJS, TailwindCSS and utilizes APIs from Clerk, Openai, Gemini, Claude, Llama and Perplexity to generate README files.
 
 
 ## Overview
 
-This project is a desktop application built using **NextronJS**, **ElectronJS**, and **TailwindCSS**, allowing users to generate professional README files for their projects with the help of various AI models such as OpenAI, Llama, Gemini, Claude, Perplexity, and more. Users can select their preferred AI model, provide their API keys, specify the project directory, and choose from a range of README templates. The AI will then generate a comprehensive README file based on the user's selections. Users can conveniently save the generated README file to their computer. 
+This project is a desktop application built using **NextronJS** and **TailwindCSS**, allowing users to generate professional README files for their projects with the help of various AI models such as OpenAI, Llama, Gemini, Claude, Perplexity, and more. Users can select their preferred AI model, provide their API keys, specify the project directory, and choose from a range of README templates. The AI will then generate a comprehensive README file based on the user's selections. Users can conveniently save the generated README file to their computer.
 
 
 ## Dependencies
