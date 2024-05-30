@@ -3,4 +3,5 @@ node_modules
 .next
 app
 dist
+env.local
 renderer/.env.local
