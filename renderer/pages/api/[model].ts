@@ -118,19 +118,15 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       const updatedSectionIndex = templateData[0].headings.findIndex(heading => heading.title === part);
 
       if (updatedSectionIndex !== -1) {
-        // If the section already exists, update its description
         templateData[0].headings[updatedSectionIndex].description = result;
       } else {
-        // If the section doesn't exist, add it to the headings array
         templateData[0].headings.push({ title: part, description: result });
       }
-      // Create the directory if it doesn't exist
       const publicDir = path.join(process.cwd(), "renderer", 'public');
       if (!fs.existsSync(publicDir)) {
         fs.mkdirSync(publicDir);
       }
 
-      // Write the JSON file
       fs.writeFileSync(jsonFilePath, JSON.stringify(templateData, null, 2));
 
       res.status(200).json({ response: JSON.stringify(templateData, null, 2) });

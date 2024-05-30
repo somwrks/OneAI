@@ -47,9 +47,6 @@ const ChatPage: React.FC = () => {
     setSelectedModel(event.target.value);
   };
 
-  const filterChat = (data: any) => {
-    // Implement your filtering logic here if needed
-  };
   const streamFileData = async () => {
     try {
       const response = await fetch(`/api/readfile`, {
@@ -73,7 +70,6 @@ const ChatPage: React.FC = () => {
           const chunk = decoder.decode(value);
           partialData += chunk;
 
-          // Update the state with the partial data
           const data = JSON.parse(partialData);
           setReadme(data);
         }
