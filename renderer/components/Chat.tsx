@@ -7,9 +7,31 @@ type Prompt = {
   purpose: string;
   directory: string;
 };
+type Heading = {
+  title: string;
+  description: string;
+};
+
+type ReadmeData = {
+  headings: Heading[];
+};
+
+const initialReadme: ReadmeData[] = [
+  {
+    headings: [
+      { title: "# Title", description: "" },
+      { title: "## Overview", description: "" },
+      { title: "## Dependencies", description: "" },
+      { title: "## Usage", description: "" },
+      { title: "## Code Structure", description: "" },
+      { title: "## Folder Structure", description: "" },
+      { title: "## License", description: "" },
+    ],
+  },
+];
 const ChatPage: React.FC = () => {
   const [selectedModel, setSelectedModel] = useState<string>("openai");
-  const [chatHistory, setChatHistory] = useState<string>("");
+  const [readme, setReadme] = useState<ReadmeData[]>(initialReadme);
   const [prompt, setPrompt] = useState<Prompt>({
     title: "",
     type: "",
@@ -17,24 +39,44 @@ const ChatPage: React.FC = () => {
     purpose: "",
     directory: "",
   });
+  const [regenerate, setRegenerate] = useState(false)
   const [start, setStart] = useState(false);
-  const [template, setTemplate] = useState<any>(0);
+  const [template, setTemplate] = useState<number>(0);
+  const [Generate, setGenerate] = useState(false);
   const handleModelChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setSelectedModel(event.target.value);
   };
 
-  const filterchat = (data: any) => {};
-  const readchat = async () => {
+  const filterChat = (data: any) => {
+    // Implement your filtering logic here if needed
+  };
+  const streamFileData = async () => {
     try {
-      const response = await fetch(`/api/readchat`, {
+      const response = await fetch(`/api/readfile`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ file:prompt.title }),
+        body: JSON.stringify({ file: prompt.title }),
       });
+
       if (response.ok) {
-        const data = await response.json();
-        filterchat(data.response);
-        setChatHistory(data.response);
+        const reader = response.body?.getReader();
+        const decoder = new TextDecoder();
+        let partialData = "";
+
+        while (true) {
+          const { value, done } = await reader?.read();
+
+          if (done) {
+            break;
+          }
+
+          const chunk = decoder.decode(value);
+          partialData += chunk;
+
+          // Update the state with the partial data
+          const data = JSON.parse(partialData);
+          setReadme(data);
+        }
       } else {
         console.error("Wrong response from server");
       }
@@ -42,41 +84,68 @@ const ChatPage: React.FC = () => {
       console.error("Error while sending question:", error);
     }
   };
-  if(start){
-    useEffect(() => {
-      const intervalId = setInterval(() => {
-        readchat();
-      }, 1000);
-  
-      return () => clearInterval(intervalId);
-    }, []);
-
-  }
-
-  const handleSendQuestion = (title: string) => async () => {
+  const handleSave = async () => {
+    console.log(readme)
     try {
-      const response = await fetch(`/api/${selectedModel}`, {
+      const response = await fetch(`/api/savefile`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: prompt,part:title, template: templates[template] }),
+        body: JSON.stringify({ readme: readme }),
       });
-  
+
       if (response.ok) {
-        const data = await response.json();
-        console.log(data);
-        // const newChatHistory = `${chatHistory}\n${prompt}\n${data.response}`;
-        // setChatHistory(newChatHistory);
+       
       } else {
-        console.error("Failed to send question");
+        console.error("Wrong response from server");
       }
     } catch (error) {
       console.error("Error while sending question:", error);
     }
   };
 
+  useEffect(() => {
+    if (Generate) {
+      streamFileData();
+      setGenerate(false);
+    }
+  }, [Generate]);
+
+  const handleSendQuestion = async () => {
+    const tasks = templates.flatMap((t) =>
+      t.headings.map(async (text) => {
+        const requestBody = {
+          prompt,
+          part: text.title,
+          template: templates[template],
+        };
+
+        try {
+          const response = await fetch(`/api/${selectedModel}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(requestBody),
+          });
+          if (response.ok) {
+            setGenerate(true);
+    setRegenerate(true)
+            const data = await response.json();
+          } else {
+            console.error("Failed to send question, Status:", response.status);
+            const errorData = await response.json();
+            console.error("Error Details:", errorData); // Log error details
+          }
+        } catch (error) {
+          console.error("Error while sending question:", error);
+        }
+      })
+    );
+
+    await Promise.all(tasks);
+  };
+
   return (
     <div>
-      <div className="flex  flex-col w-full items-center h-full gap-5 p-5">
+      <div className="flex flex-col w-full items-center h-full gap-5 p-5">
         <select
           className="bg-gray-700 w-2/3 p-3"
           value={selectedModel}
@@ -100,11 +169,10 @@ const ChatPage: React.FC = () => {
         <div className="flex flex-col w-2/3 items-center gap-y-5">
           {start ? (
             <>
-              <div className="flex flex-row w-full justify-between ">
+              <div className="flex flex-row w-full justify-between">
                 <div className="flex flex-col w-full">
-                  {" "}
                   <button
-                    className="p-3 bg-gray-500 w-1/5 rounded-md "
+                    className="p-3 bg-gray-500 w-1/5 rounded-md"
                     onClick={() => {
                       setStart(false);
                       setPrompt({
@@ -123,10 +191,12 @@ const ChatPage: React.FC = () => {
                   <select
                     className="bg-gray-700 w-2/3 p-3"
                     value={template}
-                    onChange={(e) => setTemplate(e.target.value)}
+                    onChange={(e) => setTemplate(Number(e.target.value))}
                   >
-                    {templates.map((e, i) => (
-                      <option value={i}>Template {i}</option>
+                    {templates.map((_, i) => (
+                      <option key={i} value={i}>
+                        Template {i}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -134,22 +204,36 @@ const ChatPage: React.FC = () => {
               {templates.map((t, index) =>
                 index === template ? (
                   <div key={index}>
-                    {t.headings.map((text, subIndex) => (
-                      <div key={subIndex} className="flex-col flex gap-y-5">
-                        <div className="flex text-2xl">{text.title}</div>
-                        <div className="flex text-md border text-gray-300 border-gray-600 p-4">
-                          {text.description}
+                    {t.headings.map((text, subIndex) => {
+                      return (
+                        <div key={subIndex} className="flex-col flex gap-y-5">
+                          <div className="flex text-2xl">{text.title}</div>
+                          <div className="flex text-md border text-gray-300 border-gray-600 p-4">
+                            {readme[index]?.headings.find(
+                              (e) => e.title === text.title
+                            )?.description || text.description}
+                          </div>
+                          <div className="flex flex-col items-end w-full">
+                            {subIndex == t.headings.length - 1 && (
+                              <><button
+                                className="p-3 bg-gray-500 w-1/5 rounded-md"
+                                onClick={handleSendQuestion}
+                              >
+                                {regenerate ? "Regenrate" : "Generate"}
+                              </button>
+                              {Generate&&<button
+                                className="p-3 bg-gray-500 w-1/5 rounded-md"
+                                onClick={handleSave}
+                              >
+                                 Save
+                                </button>
+                                }
+                                </>
+                            )}
+                          </div>
                         </div>
-                        <div className="flex flex-col items-end w-full">
-                          <button
-                            className="p-3 bg-gray-500 w-1/5 rounded-md "
-                            onClick={handleSendQuestion(text.title)}
-                          >
-                            Generate
-                          </button>
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 ) : null
               )}
@@ -158,7 +242,7 @@ const ChatPage: React.FC = () => {
             <>
               <div className="flex-col flex gap-y-4 text-blue-800 text-xl">
                 <input
-                  className="p-2 "
+                  className="p-2"
                   type="text"
                   placeholder="Project Title"
                   value={prompt.title}
@@ -206,7 +290,7 @@ const ChatPage: React.FC = () => {
               {Object.values(prompt).every((value) => value.trim() !== "") && (
                 <button
                   onClick={() => setStart(true)}
-                  className="p-3 bg-gray-500 w-1/5 rounded-md "
+                  className="p-3 bg-gray-500 w-1/5 rounded-md"
                 >
                   Next
                 </button>
@@ -214,9 +298,6 @@ const ChatPage: React.FC = () => {
             </>
           )}
         </div>
-      </div>
-      <div>
-        <p>{chatHistory}</p>
       </div>
     </div>
   );
