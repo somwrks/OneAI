@@ -1,7 +1,11 @@
 import path from 'path'
-import { app, ipcMain, shell } from 'electron'
+import { BrowserWindow, app, ipcMain, session } from 'electron'
 import serve from 'electron-serve'
 import { createWindow } from './helpers'
+import dotenv from 'dotenv'
+
+// Load environment variables from .env file
+dotenv.config()
 
 const isProd = process.env.NODE_ENV === 'production'
 
@@ -19,12 +23,23 @@ if (isProd) {
     height: 600,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: false,
+      contextIsolation: true,
     },
   })
-  // mainWindow.webContents.setWindowOpenHandler((details) => {
-  //   shell.openExternal(details.url); // Open URL in user's browser.
-  //   return { action: "deny" }; // Prevent the app from opening the URL.
-  // })
+
+  // Modify the session's content security policy
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Content-Security-Policy': [
+          "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval';"
+        ]
+      }
+    })
+  })
+
   if (isProd) {
     await mainWindow.loadURL('app://./home')
   } else {
@@ -35,7 +50,35 @@ if (isProd) {
 })()
 
 app.on('window-all-closed', () => {
-  app.quit()
+  if (process.platform !== 'darwin') {
+    app.quit()
+  }
+})
+
+app.on('activate', () => {
+  if (BrowserWindow.getAllWindows().length === 0) {
+    (async () => {
+      await app.whenReady()
+
+      const mainWindow = createWindow('main', {
+        width: 1000,
+        height: 600,
+        webPreferences: {
+          preload: path.join(__dirname, 'preload.js'),
+          nodeIntegration: false,
+          contextIsolation: true,
+        },
+      })
+
+      if (isProd) {
+        await mainWindow.loadURL('app://./home')
+      } else {
+        const port = process.argv[2]
+        await mainWindow.loadURL(`http://localhost:${port}/home`)
+        mainWindow.webContents.openDevTools()
+      }
+    })()
+  }
 })
 
 ipcMain.on('message', async (event, arg) => {
