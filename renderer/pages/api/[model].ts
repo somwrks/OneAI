@@ -36,10 +36,18 @@ const getPromptWithFiles = (
   directory: string
 ) => {
   const fileList = traverseDirectory(directory);
-  const fileListString = fileList.join("\n");
+  let fileListString = "";
+  
+  fileList.forEach((filePath) => {
+    const fileName = path.basename(filePath);
+    const fileContent = fs.readFileSync(filePath, 'utf-8');
+    fileListString += `${fileName} : contains : ${fileContent}\n`;
+  });
+  
   const relevantTemplatePart = template.headings.find(
     (heading: any) => heading.title === part
   );
+  
   return `You are an AI assistant. Your task is to generate descriptions for the README file of a project based on the provided template and project details. Here are the details of the project:\n
 ${JSON.stringify(prompt, null, 2)}\n
 The project contains the following files:\n
@@ -53,7 +61,7 @@ Use the project details and file list to create an accurate and detailed descrip
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const { model } = req.query;
-  const { prompt,apiKey, part, template } = req.body;
+  const { prompt, apiKey, part, template } = req.body;
   const projectDir = path.resolve(process.cwd(), prompt.directory);
   if (req.method === "POST") {
     try {
@@ -114,15 +122,16 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         );
       }
 
-    
-      const updatedSectionIndex = templateData[0].headings.findIndex(heading => heading.title === part);
+      const updatedSectionIndex = templateData[0].headings.findIndex(
+        (heading) => heading.title === part
+      );
 
       if (updatedSectionIndex !== -1) {
         templateData[0].headings[updatedSectionIndex].description = result;
       } else {
         templateData[0].headings.push({ title: part, description: result });
       }
-      const publicDir = path.join(process.cwd(), "renderer", 'public');
+      const publicDir = path.join(process.cwd(), "renderer", "public");
       if (!fs.existsSync(publicDir)) {
         fs.mkdirSync(publicDir);
       }
@@ -130,8 +139,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       fs.writeFileSync(jsonFilePath, JSON.stringify(templateData, null, 2));
 
       res.status(200).json({ response: JSON.stringify(templateData, null, 2) });
-
-
     } catch (error) {
       console.error("Error while handling request:", error);
       res.status(500).json({ error: "Internal Server Error" });
@@ -140,4 +147,3 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     res.status(405).json({ error: "Method Not Allowed" });
   }
 };
-
