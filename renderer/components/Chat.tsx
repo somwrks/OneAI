@@ -30,7 +30,7 @@ const initialReadme: ReadmeData[] = [
   },
 ];
 const ChatPage: React.FC = () => {
-  const [selectedModel, setSelectedModel] = useState<string>("gpt-3.5-turbo");
+  const [selectedModel, setSelectedModel] = useState<string>("gemini-1.5-flash");
   const [readme, setReadme] = useState<ReadmeData[]>(initialReadme);
   const [prompt, setPrompt] = useState<Prompt>({
     title: "",
@@ -150,7 +150,7 @@ const ChatPage: React.FC = () => {
           value={selectedModel}
           onChange={handleModelChange}
         >
-          <option  value="gpt-3.5-turbo">
+          <option  disabled value="gpt-3.5-turbo">
           gpt-3.5-turbo
           </option>
           <option value="gemini-1.5-flash">gemini-1.5-flash</option>
