@@ -30,7 +30,7 @@ const initialReadme: ReadmeData[] = [
   },
 ];
 const ChatPage: React.FC = () => {
-  const [selectedModel, setSelectedModel] = useState<string>("openai");
+  const [selectedModel, setSelectedModel] = useState<string>("gpt-3.5-turbo");
   const [readme, setReadme] = useState<ReadmeData[]>(initialReadme);
   const [prompt, setPrompt] = useState<Prompt>({
     title: "",
@@ -80,7 +80,7 @@ const ChatPage: React.FC = () => {
       alert("Error while sending question:"+error);
     }
   };
-  const [apiKey, setApiKey] = useState<string>(process.env.GEMINI_API_KEY)
+  const [apiKey, setApiKey] = useState<string>(process.env.GEMINI_API_KEY||"")
   const handleSave = async () => {
     console.log(readme)
     try {
