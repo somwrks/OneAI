@@ -1,5 +1,7 @@
 import React, { useState, useEffect, ChangeEvent } from "react";
 import templates from "../public/template.json";
+import { useRouter } from "next/router";
+
 type Prompt = {
   title: string;
   type: string;
@@ -30,7 +32,8 @@ const initialReadme: ReadmeData[] = [
   },
 ];
 const ChatPage: React.FC = () => {
-  const [selectedModel, setSelectedModel] = useState<string>("gemini-1.5-flash");
+  const [selectedModel, setSelectedModel] =
+    useState<string>("gemini-1.5-flash");
   const [readme, setReadme] = useState<ReadmeData[]>(initialReadme);
   const [prompt, setPrompt] = useState<Prompt>({
     title: "",
@@ -39,23 +42,25 @@ const ChatPage: React.FC = () => {
     purpose: "",
     directory: "",
   });
-  const [regenerate, setRegenerate] = useState(false)
+  const [regenerate, setRegenerate] = useState(false);
   const [start, setStart] = useState(false);
   const [template, setTemplate] = useState<number>(0);
   const [Generate, setGenerate] = useState(false);
   const handleModelChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setSelectedModel(event.target.value);
   };
-
+  const [save, setSave] = useState(false);
   const streamFileData = async () => {
+    setLoading(true);
     try {
       const response = await fetch(`/api/readfile`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ file: prompt.title }),
       });
+      setLoading(true);
 
-      if (response.ok) {
+      if (response.ok && !loading) {
         const reader = response.body?.getReader();
         const decoder = new TextDecoder();
         let partialData = "";
@@ -77,30 +82,58 @@ const ChatPage: React.FC = () => {
         alert("Wrong response from server");
       }
     } catch (error) {
-      alert("Error while sending question:"+error);
+      alert("Error while sending question:" + error);
     }
   };
-  const [apiKey, setApiKey] = useState<string>(process.env.GEMINI_API_KEY||"")
+  const [apiKey, setApiKey] = useState<string>(
+    process.env.GEMINI_API_KEY || ""
+  );
+  const [loading, setLoading] = useState(false);
   const handleSave = async () => {
-    console.log(readme)
+    setLoading(true);
     try {
       const response = await fetch(`/api/savefile`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ data: readme, dir: prompt.directory,title:prompt.title }),
+        body: JSON.stringify({
+          data: readme,
+          dir: prompt.directory,
+          title: prompt.title,
+        }),
       });
+      setLoading(false);
 
-      if (response.ok) {
-       
-      } else {
-        alert("Wrong response from server");
+      if (response.ok && !loading) {
+        setSave(true);
       }
-    } catch (error) {
-      alert("Error while sending question:"+error);
-    }
+    } catch (error) {}
   };
-  
 
+  const router = useRouter();
+  const handlequit = async () => {
+    try {
+      const response = await fetch(`/api/deletejson`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ file: prompt.title }),
+      });
+    } catch (error) {
+      alert("Invalid API Key" + error);
+    }
+    window.ipc.openDirectory(prompt.directory);
+
+    setStart(false);
+    setRegenerate(false);
+    setGenerate(false);
+    setSave(false);
+    setPrompt({
+      title: "",
+      type: "",
+      techstack: "",
+      purpose: "",
+      directory: "",
+    });
+  };
   useEffect(() => {
     if (Generate) {
       streamFileData();
@@ -115,8 +148,9 @@ const ChatPage: React.FC = () => {
           prompt,
           part: text.title,
           template: templates[template],
-          apiKey:apiKey
+          apiKey: apiKey,
         };
+        setGenerate(true);
 
         try {
           const response = await fetch(`/api/${selectedModel}`, {
@@ -125,16 +159,12 @@ const ChatPage: React.FC = () => {
             body: JSON.stringify(requestBody),
           });
           if (response.ok) {
-            setGenerate(true);
-    setRegenerate(true)
+            setRegenerate(true);
             const data = await response.json();
           } else {
-            alert("Failed to send question, Status:"+response.status);
-            const errorData = await response.json();
-            alert("Error Details:"+errorData); 
           }
         } catch (error) {
-          alert("Error while sending question:"+error);
+          alert("Error with api key");
         }
       })
     );
@@ -150,11 +180,11 @@ const ChatPage: React.FC = () => {
           value={selectedModel}
           onChange={handleModelChange}
         >
-          <option  disabled value="gpt-3.5-turbo">
-          gpt-3.5-turbo
+          <option disabled value="gpt-3.5-turbo">
+            gpt-3.5-turbo
           </option>
           <option value="gemini-1.5-flash">gemini-1.5-flash</option>
-          <option  value="llama3-70b">llama3-70b</option>
+          <option value="llama3-70b">llama3-70b</option>
           <option disabled value="perplexity">
             Perplexity
           </option>
@@ -164,90 +194,91 @@ const ChatPage: React.FC = () => {
           <option disabled value="gooseai">
             GooseAI
           </option>
-         
         </select>
         <input
-                  className="bg-gray-700 w-2/3 p-3"
-                  type="text"
-                  placeholder="Enter API KEY"
-                  value={apiKey}
-                  disabled={!Generate&&regenerate}
-                  onChange={(e) =>
-                    setApiKey(e.target.value)
-                  }
-                />
+          className="bg-gray-700 w-2/3 p-3"
+          type="text"
+          placeholder="Enter API KEY"
+          value={apiKey}
+          disabled={!Generate && regenerate}
+          onChange={(e) => setApiKey(e.target.value)}
+        />
         <div className="flex flex-col w-2/3 items-center gap-y-5">
           {start ? (
-            <>
-              <div className="flex flex-row w-full justify-between">
-                <div className="flex flex-col w-full">
-                  <button
-                    className="p-3 bg-gray-500 w-1/5 rounded-md"
-                    onClick={() => {
-                      setStart(false);
-                      setPrompt({
-                        title: "",
-                        type: "",
-                        techstack: "",
-                        purpose: "",
-                        directory: "",
-                      });
-                    }}
-                  >
-                    Go back
-                  </button>
-                </div>
-                <div className="flex w-full">
-                  <select
-                    className="bg-gray-700 w-2/3 p-3"
-                    value={template}
-                    onChange={(e) => setTemplate(Number(e.target.value))}
-                  >
-                    {templates.map((_, i) => (
-                      <option key={i} value={i}>
-                        Template {i}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              {templates.map((t, index) =>
-                index === template ? (
-                  <div key={index}>
-                    {t.headings.map((text, subIndex) => {
-                      return (
-                        <div key={subIndex} className="flex-col flex gap-y-5">
-                          <div className="flex text-2xl">{text.title}</div>
-                          <div className="flex text-md border text-gray-300 border-gray-600 p-4">
-                            {readme[index]?.headings.find(
-                              (e) => e.title === text.title
-                            )?.description || text.description}
-                          </div>
-                          <div className="flex flex-col items-end w-full">
-                            {subIndex == t.headings.length - 1 && (
-                              <><button
-                                className="p-3 bg-gray-500 w-1/5 rounded-md"
-                                onClick={handleSendQuestion}
-                              >
-                                {regenerate ? "Regenrate" : "Generate"}
-                              </button>
-                              {!Generate&&regenerate&&<button
-                                className="p-3 bg-gray-500 w-1/5 rounded-md"
-                                onClick={handleSave}
-                              >
-                                 Save
-                                </button>
-                                }
-                                </>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
+            !save ? (
+              <>
+                <div className="flex flex-row w-full justify-between">
+                  <div className="flex flex-col w-full">
+                    <button
+                      className="p-3 bg-gray-500 w-1/5 rounded-md"
+                      onClick={() => {
+                        setStart(false);
+                      }}
+                    >
+                      Go back
+                    </button>
                   </div>
-                ) : null
-              )}
-            </>
+                  <div className="flex w-full">
+                    <select
+                      className="bg-gray-700 w-2/3 p-3"
+                      value={template}
+                      onChange={(e) => setTemplate(Number(e.target.value))}
+                    >
+                      {templates.map((_, i) => (
+                        <option key={i} value={i}>
+                          Template {i}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                {templates.map((t, index) =>
+                  index === template ? (
+                    <div key={index}>
+                      {t.headings.map((text, subIndex) => {
+                        return (
+                          <div key={subIndex} className="flex-col flex gap-y-5">
+                            <div className="flex text-2xl">{text.title}</div>
+                            <div className="flex text-md border text-gray-300 border-gray-600 p-4">
+                              {readme[index]?.headings.find(
+                                (e) => e.title === text.title
+                              )?.description || text.description}
+                            </div>
+                            <div className="flex flex-col items-end w-full">
+                              {subIndex == t.headings.length - 1 && (
+                                <>
+                                  <button
+                                    className="p-3 bg-gray-500 w-1/5 rounded-md"
+                                    onClick={handleSendQuestion}
+                                  >
+                                    {regenerate ? "Regenrate" : "Generate"}
+                                  </button>
+                                  {!Generate && regenerate && (
+                                    <button
+                                      className="p-3 bg-gray-500 w-1/5 rounded-md"
+                                      onClick={handleSave}
+                                    >
+                                      Save
+                                    </button>
+                                  )}
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : null
+                )}
+              </>
+            ) : (
+              <button
+                className="p-3 bg-gray-500 w-1/5 rounded-md"
+                onClick={handlequit}
+              >
+                Open Saved File
+              </button>
+            )
           ) : (
             <>
               <div className="flex-col w-full flex gap-y-4 text-blue-800 text-xl">
@@ -296,7 +327,6 @@ const ChatPage: React.FC = () => {
                     setPrompt({ ...prompt, directory: e.target.value })
                   }
                 />
-              
               </div>
               {Object.values(prompt).every((value) => value.trim() !== "") && (
                 <button

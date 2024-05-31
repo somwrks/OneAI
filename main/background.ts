@@ -1,22 +1,22 @@
-import path from 'path'
-import { BrowserWindow, app, ipcMain, session } from 'electron'
-import serve from 'electron-serve'
-import { createWindow } from './helpers'
-import dotenv from 'dotenv'
+import path from 'path';
+import { BrowserWindow, app, ipcMain, session, shell } from 'electron';
+import serve from 'electron-serve';
+import { createWindow } from './helpers';
+import dotenv from 'dotenv';
 
 // Load environment variables from .env file
-dotenv.config()
+dotenv.config();
 
-const isProd = process.env.NODE_ENV === 'production'
+const isProd = process.env.NODE_ENV === 'production';
 
 if (isProd) {
-  serve({ directory: 'app' })
+  serve({ directory: 'app' });
 } else {
-  app.setPath('userData', `${app.getPath('userData')} (development)`)
+  app.setPath('userData', `${app.getPath('userData')} (development)`);
 }
 
-;(async () => {
-  await app.whenReady()
+(async () => {
+  await app.whenReady();
 
   const mainWindow = createWindow('main', {
     width: 1000,
@@ -26,7 +26,7 @@ if (isProd) {
       nodeIntegration: false,
       contextIsolation: true,
     },
-  })
+  });
 
   // Modify the session's content security policy
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
@@ -37,28 +37,28 @@ if (isProd) {
           "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval';"
         ]
       }
-    })
-  })
+    });
+  });
 
   if (isProd) {
-    await mainWindow.loadURL('app://./home')
+    await mainWindow.loadURL('app://./home');
   } else {
-    const port = process.argv[2]
-    await mainWindow.loadURL(`http://localhost:${port}/home`)
-    mainWindow.webContents.openDevTools()
+    const port = process.argv[2];
+    await mainWindow.loadURL(`http://localhost:${port}/home`);
+    mainWindow.webContents.openDevTools();
   }
-})()
+})();
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    app.quit()
+    app.quit();
   }
-})
+});
 
 app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     (async () => {
-      await app.whenReady()
+      await app.whenReady();
 
       const mainWindow = createWindow('main', {
         width: 1000,
@@ -68,19 +68,31 @@ app.on('activate', () => {
           nodeIntegration: false,
           contextIsolation: true,
         },
-      })
+      });
 
       if (isProd) {
-        await mainWindow.loadURL('app://./home')
+        await mainWindow.loadURL('app://./home');
       } else {
-        const port = process.argv[2]
-        await mainWindow.loadURL(`http://localhost:${port}/home`)
-        mainWindow.webContents.openDevTools()
+        const port = process.argv[2];
+        await mainWindow.loadURL(`http://localhost:${port}/home`);
+        mainWindow.webContents.openDevTools();
       }
-    })()
+    })();
   }
-})
+});
 
 ipcMain.on('message', async (event, arg) => {
-  event.reply('message', `${arg} World!`)
-})
+  event.reply('message', `${arg} World!`);
+});
+
+ipcMain.on('open-directory', (event, dirPath) => {
+  shell.openPath(dirPath)
+    .then(response => {
+      if (response) {
+        console.error(response);
+      } else {
+        console.log('Directory opened successfully');
+      }
+    })
+    .catch(err => console.error(err));
+});

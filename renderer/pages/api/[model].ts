@@ -18,7 +18,8 @@ const traverseDirectory = (dir: string, fileList: string[] = []) => {
       file !== ".vscode" &&
       file !== "app" &&
       file !== "dist" &&
-      file !== ".next"
+      file !== ".next"&&
+      file.toLowerCase() !== "readme.md"
     ) {
       traverseDirectory(filePath, fileList);
     } else if (stat.isFile()) {
@@ -69,44 +70,44 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       // console.log(fullPrompt)
       let response;
       let result;
+  
+  switch (model) {
+    case "gpt-3.5-turbo":
+      const openai = new OpenAI({
+        apiKey: apiKey,
+      });
 
-      switch (model) {
-        case "gpt-3.5-turbo":
-          const openai = new OpenAI({
-            apiKey: apiKey,
-          });
+      response = await openai.chat.completions.create({
+        model: model,
+        messages: [{ role: "user", content: fullPrompt }],
+        max_tokens: 150,
+      });
+      result = response.choices[0].message?.content || "";
+      break;
 
-          response = await openai.chat.completions.create({
-            model: model,
-            messages: [{ role: "user", content: fullPrompt }],
-            max_tokens: 150,
-          });
-          result = response.choices[0].message?.content || "";
-          break;
+    case "gemini-1.5-flash":
+      const genAI = new GoogleGenerativeAI(apiKey);
+      response = await genAI
+        .getGenerativeModel({ model: "gemini-1.5-flash" })
+        .generateContent(fullPrompt);
+      result = await response.response;
+      result = result.text();
+      break;
 
-        case "gemini-1.5-flash":
-          const genAI = new GoogleGenerativeAI(apiKey);
-          response = await genAI
-            .getGenerativeModel({ model: "gemini-1.5-flash" })
-            .generateContent(fullPrompt);
-          result = await response.response;
-          result = result.text();
-          break;
+    // case "llama3-70b":
+    //   const llamaAPI = new LlamaAI({ apiKey: process.env.LLAMA_API_KEY });
+    //   response = await llamaAPI.generate({
+    //     model: "llama3-70b",
+    //     prompt: fullPrompt,
+    //     maxTokens: 150,
+    //   });
+    //   result = response.data.text;
+    //   break;
 
-        // case "llama3-70b":
-        //   const llamaAPI = new LlamaAI({ apiKey: process.env.LLAMA_API_KEY });
-        //   response = await llamaAPI.generate({
-        //     model: "llama3-70b",
-        //     prompt: fullPrompt,
-        //     maxTokens: 150,
-        //   });
-        //   result = response.data.text;
-        //   break;
-
-        default:
-          res.status(400).json({ error: "Invalid model" });
-          return;
-      }
+    default:
+      res.status(400).json({ error: "Invalid model" });
+      return;
+  }
       const jsonFilePath = path.join(
         process.cwd(),
         "renderer",
