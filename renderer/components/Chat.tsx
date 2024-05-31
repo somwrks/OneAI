@@ -80,7 +80,7 @@ const ChatPage: React.FC = () => {
       alert("Error while sending question:"+error);
     }
   };
-  const [apiKey, setApiKey] = useState("")
+  const [apiKey, setApiKey] = useState<string>(process.env.GEMINI_API_KEY)
   const handleSave = async () => {
     console.log(readme)
     try {
