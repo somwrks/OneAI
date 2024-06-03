@@ -5,10 +5,14 @@
 ![image](https://github.com/somwrks/OneAI/assets/85481905/6fffb256-b5fe-4523-aa23-fc07d2c297b6)
 ![image](https://github.com/somwrks/OneAI/assets/85481905/db18e542-0c62-415c-8baa-b45ca2109bca)
 
+
 # OneAI
 
 This is a desktop application where user can login in a secured environment to select from various ai models such as Openai, Llama, Gemini, Claude, Perplexity,  upon entering their apikeys, user can provide directory to their project, user can select from various templates present for readme then ai would do the job to build the readme out of it for the project, user can save the readme file on their computer aswell. The application is built using NextronJS, ElectronJS, TailwindCSS and utilizes APIs from Clerk, Openai, Gemini, Claude, Llama and Perplexity to generate README files.
 
+### Update: 
+
+Disabled Clerk Login for build process, you can now download exe file  [MIT License](https://github.com/somwrks/OneAI/tree/master/dist/My Nextron App Setup 1.0.0)
 
 ## Overview
 

@@ -3,7 +3,6 @@ import type { AppProps } from 'next/app'
 import {
   ClerkProvider,
   SignInButton,
-  SignOutButton,
   SignedIn,
   SignedOut,
 } from "@clerk/nextjs";
@@ -39,10 +38,9 @@ return(
         </html>
       </SignedOut>
       <SignedIn>
-        <SignOutButton/>
       <Component {...pageProps} />
-       </SignedIn>
-    </ClerkProvider>
+    </SignedIn>
+     </ClerkProvider>
 )
 }
 

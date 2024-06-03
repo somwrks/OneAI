@@ -1,7 +1,8 @@
 import React, { useState, useEffect, ChangeEvent } from "react";
 import templates from "../public/template.json";
-import { useRouter } from "next/router";
-
+import useTypingAnimation from "./useTypingAnimation ";
+import AnimatedText from "./AnimatedText";
+import { SignOutButton } from "@clerk/clerk-react";
 type Prompt = {
   title: string;
   type: string;
@@ -32,8 +33,12 @@ const initialReadme: ReadmeData[] = [
   },
 ];
 const ChatPage: React.FC = () => {
+  const [typedDescription, setTypedDescription] = useState("");
+
   const [selectedModel, setSelectedModel] =
     useState<string>("gemini-1.5-flash");
+  const [loading, setLoading] = useState(false);
+
   const [readme, setReadme] = useState<ReadmeData[]>(initialReadme);
   const [prompt, setPrompt] = useState<Prompt>({
     title: "",
@@ -58,37 +63,62 @@ const ChatPage: React.FC = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ file: prompt.title }),
       });
-      setLoading(true);
 
       if (response.ok && !loading) {
         const reader = response.body?.getReader();
         const decoder = new TextDecoder();
         let partialData = "";
+        let completeData = "";
 
         while (true) {
-          const { value, done } = await reader?.read();
-
-          if (done) {
-            break;
-          }
+          const { value, done } = (await reader?.read()) || {};
+          if (done) break;
 
           const chunk = decoder.decode(value);
           partialData += chunk;
 
-          const data = JSON.parse(partialData);
-          setReadme(data);
+          try {
+            completeData = JSON.parse(partialData);
+            if (
+              Array.isArray(completeData) &&
+              completeData.every((item) => "headings" in item)
+            ) {
+              handleTypingEffect(completeData);
+              partialData = ""; // Reset partialData if JSON parsing is successful
+            }
+          } catch (e) {
+            // JSON parsing error is ignored here as it may be due to incomplete data
+          }
         }
-      } else {
-        alert("Wrong response from server");
+
+        setLoading(false);
       }
     } catch (error) {
-      alert("Error while sending question:" + error);
+      alert("Error while recieving question:" + error);
+      setLoading(false);
     }
   };
+
+  const handleTypingEffect = (data: ReadmeData[]) => {
+    const fullText =
+      data[0]?.headings.map((heading) => heading.description).join("\n") || "";
+    let index = 0;
+
+    const intervalId = setInterval(() => {
+      if (index < fullText.length) {
+        setTypedDescription((prev) => prev + fullText[index]);
+        index++;
+      } else {
+        clearInterval(intervalId);
+      }
+    }, 50); // Adjust typing speed here
+
+    setReadme(data);
+  };
+
   const [apiKey, setApiKey] = useState<string>(
     process.env.GEMINI_API_KEY || ""
   );
-  const [loading, setLoading] = useState(false);
   const handleSave = async () => {
     setLoading(true);
     try {
@@ -101,16 +131,17 @@ const ChatPage: React.FC = () => {
           title: prompt.title,
         }),
       });
-      setLoading(false);
 
       if (response.ok && !loading) {
         setSave(true);
+        setLoading(false);
       }
     } catch (error) {}
   };
 
-  const router = useRouter();
   const handlequit = async () => {
+    setLoading(true);
+
     try {
       const response = await fetch(`/api/deletejson`, {
         method: "POST",
@@ -120,6 +151,8 @@ const ChatPage: React.FC = () => {
     } catch (error) {
       alert("Invalid API Key" + error);
     }
+    setLoading(false);
+
     window.ipc.openDirectory(prompt.directory);
 
     setStart(false);
@@ -134,14 +167,10 @@ const ChatPage: React.FC = () => {
       directory: "",
     });
   };
-  useEffect(() => {
-    if (Generate) {
-      streamFileData();
-      setGenerate(false);
-    }
-  }, [Generate]);
 
   const handleSendQuestion = async () => {
+    setLoading(true);
+
     const tasks = templates.flatMap((t) =>
       t.headings.map(async (text) => {
         const requestBody = {
@@ -150,7 +179,6 @@ const ChatPage: React.FC = () => {
           template: templates[template],
           apiKey: apiKey,
         };
-        setGenerate(true);
 
         try {
           const response = await fetch(`/api/${selectedModel}`, {
@@ -159,9 +187,11 @@ const ChatPage: React.FC = () => {
             body: JSON.stringify(requestBody),
           });
           if (response.ok) {
-            setRegenerate(true);
+            streamFileData();
+            setGenerate(true);
             const data = await response.json();
           } else {
+            setRegenerate(false);
           }
         } catch (error) {
           alert("Error with api key");
@@ -170,10 +200,17 @@ const ChatPage: React.FC = () => {
     );
 
     await Promise.all(tasks);
+    setLoading(false);
+    setRegenerate(true);
   };
 
   return (
     <div>
+      {loading && (
+        <div className="flex flex-col top-0 min-h-screen w-full backdrop-blur-sm items-center justify-center text-center text-white fixed z-50">
+          Loading...
+        </div>
+      )}
       <div className="flex flex-col w-full items-center h-full gap-5 p-5">
         <select
           className="bg-gray-700 w-2/3 p-3"
@@ -210,7 +247,7 @@ const ChatPage: React.FC = () => {
                 <div className="flex flex-row w-full justify-between">
                   <div className="flex flex-col w-full">
                     <button
-                      className="p-3 bg-gray-500 w-1/5 rounded-md"
+                      className="p-3 bg-gray-700 w-full "
                       onClick={() => {
                         setStart(false);
                       }}
@@ -220,7 +257,7 @@ const ChatPage: React.FC = () => {
                   </div>
                   <div className="flex w-full">
                     <select
-                      className="bg-gray-700 w-2/3 p-3"
+                      className="bg-gray-700 w-full p-3"
                       value={template}
                       onChange={(e) => setTemplate(Number(e.target.value))}
                     >
@@ -236,15 +273,24 @@ const ChatPage: React.FC = () => {
                   index === template ? (
                     <div key={index}>
                       {t.headings.map((text, subIndex) => {
+                        const description =
+                          readme[index]?.headings.find(
+                            (e) => e.title === text.title
+                          )?.description || text.description;
+const condition = readme[index]?.headings.find(
+  (e) => e.title === text.title
+)?.description? true: false;
                         return (
                           <div key={subIndex} className="flex-col flex gap-y-5">
                             <div className="flex text-2xl">{text.title}</div>
                             <div className="flex text-md border text-gray-300 border-gray-600 p-4">
-                              {readme[index]?.headings.find(
-                                (e) => e.title === text.title
-                              )?.description || text.description}
+                              <p style={{ whiteSpace: "pre-wrap" }}>
+                                {condition ? 
+                                <AnimatedText text={description} />
+                                : description} 
+                              </p>
                             </div>
-                            <div className="flex flex-col items-end w-full">
+                            <div className="flex flex-col space-y-12 items-end w-full">
                               {subIndex == t.headings.length - 1 && (
                                 <>
                                   <button
@@ -253,7 +299,7 @@ const ChatPage: React.FC = () => {
                                   >
                                     {regenerate ? "Regenrate" : "Generate"}
                                   </button>
-                                  {!Generate && regenerate && (
+                                  {regenerate && (
                                     <button
                                       className="p-3 bg-gray-500 w-1/5 rounded-md"
                                       onClick={handleSave}
@@ -327,6 +373,10 @@ const ChatPage: React.FC = () => {
                     setPrompt({ ...prompt, directory: e.target.value })
                   }
                 />
+                <div className="flex p-2 bg-white flex-col w-full ">
+                <SignOutButton />
+
+                </div>
               </div>
               {Object.values(prompt).every((value) => value.trim() !== "") && (
                 <button
