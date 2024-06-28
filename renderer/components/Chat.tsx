@@ -134,8 +134,13 @@ const ChatPage: React.FC = () => {
           title: prompt.title,
         }),
       });
+      const response1 = await fetch(`/api/deletejson`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ file: prompt.title }),
+      });
 
-      if (response.ok && !loading) {
+      if (response.ok &&response1.ok && !loading) {
         setSave(true);
         setLoading(false);
       }
@@ -143,18 +148,6 @@ const ChatPage: React.FC = () => {
   };
 
   const handleQuit = async () => {
-    setLoading(true);
-
-    try {
-      const response = await fetch(`/api/deletejson`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ file: prompt.title }),
-      });
-    } catch (error) {
-      alert("Invalid API Key" + error);
-    }
-    setLoading(false);
 
     window.ipc.openDirectory(prompt.directory);
 
@@ -172,9 +165,16 @@ const ChatPage: React.FC = () => {
   };
 
   const handleSendQuestion = async () => {
-    console.log(apiKey);
     setLoading(true);
-
+    const response1 = await fetch(`/api/refine`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({prompt,apiKey}),
+    });
+      const data1 = await response1.json();
+      const nestedJson = JSON.parse(data1.response.replace(/```json|```/g, ''));
+      setPrompt(nestedJson)
+      console.log("refined prompt" , prompt)
     const tasks = templates.flatMap((t) =>
       t.headings.map(async (text) => {
         const requestBody = {

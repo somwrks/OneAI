@@ -60,7 +60,7 @@ const PromptForm: React.FC<PromptFormProps> = ({ prompt, setPrompt, setStart }) 
       {Object.values(prompt).every((value) => value.trim() !== "") && (
         <button
           onClick={() => setStart(true)}
-          className="p-3 bg-gray-500 w-1/5 rounded-md"
+          className="p-3 bg-gray-500 w-1/5 cursor-pointer rounded-md"
         >
           Next
         </button>
