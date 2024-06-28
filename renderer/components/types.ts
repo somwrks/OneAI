@@ -4,6 +4,7 @@ export type Prompt = {
     techstack: string;
     purpose: string;
     directory: string;
+    contribute: string;
   };
   
   export type Heading = {

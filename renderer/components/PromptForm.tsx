@@ -10,7 +10,7 @@ type PromptFormProps = {
 const PromptForm: React.FC<PromptFormProps> = ({ prompt, setPrompt, setStart }) => {
   return (
     <>
-      <div className="flex-col w-full flex gap-y-4 text-blue-800 text-xl">
+      <div className="flex-col w-full flex gap-y-4 text-blue-800 text-md">
         <input
           className="p-2"
           type="text"
@@ -54,6 +54,15 @@ const PromptForm: React.FC<PromptFormProps> = ({ prompt, setPrompt, setStart }) 
           value={prompt.directory}
           onChange={(e) =>
             setPrompt({ ...prompt, directory: e.target.value })
+          }
+        />
+        <input
+          className="p-2"
+          type="text"
+          placeholder="Cannot Contribute | Ask to Contrbute | How to contribute"
+          value={prompt.contribute}
+          onChange={(e) =>
+            setPrompt({ ...prompt, contribute: e.target.value })
           }
         />
       </div>

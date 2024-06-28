@@ -15,7 +15,6 @@ const initialReadme: ReadmeData[] = [
       { title: "## Dependencies", description: "" },
       { title: "## Usage", description: "" },
       { title: "## Code Structure", description: "" },
-      { title: "## Folder Structure", description: "" },
       { title: "## License", description: "" },
     ],
   },
@@ -31,6 +30,7 @@ const ChatPage: React.FC = () => {
     type: "",
     techstack: "",
     purpose: "",
+    contribute: "",
     directory: "",
   });
   const [regenerate, setRegenerate] = useState(false);
@@ -161,6 +161,7 @@ const ChatPage: React.FC = () => {
       techstack: "",
       purpose: "",
       directory: "",
+      contribute:"",
     });
   };
 
@@ -174,7 +175,7 @@ const ChatPage: React.FC = () => {
       const data1 = await response1.json();
       const nestedJson = JSON.parse(data1.response.replace(/```json|```/g, ''));
       setPrompt(nestedJson)
-      console.log("refined prompt" , prompt)
+      
     const tasks = templates.flatMap((t) =>
       t.headings.map(async (text) => {
         const requestBody = {
