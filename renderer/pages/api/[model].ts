@@ -65,7 +65,12 @@ const getPromptWithFiles = (
   fileList.forEach((filePath) => {
     const fileName = path.basename(filePath);
     const fileContent = fs.readFileSync(filePath, "utf-8");
-    fileListString += `${fileName}\n`;
+    const fileLines = fileContent.split("\n");
+    const snippet =
+      fileLines.length > 5
+        ? fileLines.slice(0, 5).join("\n") + "\n..."
+        : fileLines.join("\n");
+    fileListString += `${fileName}\n${snippet}\n\n`;
   });
 
   const relevantTemplatePart = template.headings.find(
@@ -80,8 +85,9 @@ Please generate the description for the following part of the README template:\n
 Title: ${relevantTemplatePart.title}\n
 Description: ${relevantTemplatePart.description}\n
 The Readme Template: ${JSON.stringify(template)}
-Use the project details and file list to create an accurate and detailed description. Just return the description, not the title. Don't mention too many unneccessary files or folders like node_modules or ts configs.`;
+Use the project details and file list to create an accurate and detailed description. Just return the description, not the title. Don't mention too many unnecessary files or folders like node_modules or ts configs.`;
 };
+
 const handleAPIRequest = async (req: NextApiRequest, res: NextApiResponse) => {
   const { model } = req.query;
   const { prompt, apiKey, part, template } = req.body;
@@ -94,6 +100,7 @@ const handleAPIRequest = async (req: NextApiRequest, res: NextApiResponse) => {
 
   try {
     const fullPrompt = getPromptWithFiles(prompt, template, part, projectDir);
+    console.log(fullPrompt)
     let response, result;
 
     switch (model) {
