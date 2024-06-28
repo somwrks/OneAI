@@ -245,7 +245,7 @@ const ChatPage: React.FC = () => {
             <PromptForm prompt={prompt} setPrompt={setPrompt} setStart={setStart} />
           )}
         </div>
-        <div className="flex p-2 bg-white flex-col w-full ">
+        <div className="flex p-2 bg-gray-400 flex-col w-1/2 ">
           <SignOutButton />
         </div>
       </div>
