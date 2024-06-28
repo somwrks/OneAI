@@ -1,100 +1,18 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import fs from "fs";
-import path from "path";
-import { OpenAI } from "openai";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import LlamaAI from "llamaai";
-const EXCLUDE_FILES = [
-  "node_modules",
-  ".vscode",
-  "app",
-  "dist",
-  ".next",
-  ".git",
-  "README.md",
-];
-
-const EXCLUDE_EXTENSIONS = [
-  ".sample",
-  ".md",
-  ".png",
-  ".mp3",
-  ".mp4",
-  ".webp",
-  ".gif",
-  ".svg",
-  ".ico",
-  ".jpeg",
-  ".jpg",
-];
-
-const EXCLUDE_PATTERNS = [
-  /COMMIT_EDITMSG/,
-  /FETCH_HEAD/,
-  /HEAD/,
-  /^[0-9a-f]{40}$/, // Matches commit hashes
-];
-const traverseDirectory = (dir: string, fileList: string[] = []) => {
-  const files = fs.readdirSync(dir);
-  for (const file of files) {
-    const filePath = path.join(dir, file);
-    const stat = fs.statSync(filePath);
-    const shouldExclude =
-      EXCLUDE_FILES.includes(file) ||
-      EXCLUDE_EXTENSIONS.some((ext) => file.endsWith(ext)) ||
-      EXCLUDE_PATTERNS.some((pattern) => pattern.test(file));
-
-    if (stat.isDirectory() && !shouldExclude) {
-      traverseDirectory(filePath, fileList);
-    } else if (stat.isFile() && !shouldExclude) {
-      fileList.push(filePath);
-    }
-  }
-  return fileList;
-};
-
-const getPromptWithFiles = (
-  prompt: any,
-  template: any,
-  part: string,
-  directory: string
-) => {
-  const fileList = traverseDirectory(directory);
-  let fileListString = "";
-
-  fileList.forEach((filePath) => {
-    const fileName = path.basename(filePath);
-    const fileContent = fs.readFileSync(filePath, "utf-8");
-    const fileLines = fileContent.split("\n");
-    const snippet =
-      fileLines.length > 5
-        ? fileLines.slice(0, 5).join("\n") + "\n..."
-        : fileLines.join("\n");
-    fileListString += `${fileName}\n${snippet}\n\n`;
-  });
-
-  const relevantTemplatePart = template.headings.find(
-    (heading: any) => heading.title === part
-  );
-
-  return `You are an AI assistant. Your task is to generate descriptions for the README file of a project based on the provided template and project details. Here are the details of the project:\n
-${JSON.stringify(prompt, null, 2)}\n
-The project contains the following files:\n
-${fileListString}\n
-Please generate the description for the following part of the README template:\n
-Title: ${relevantTemplatePart.title}\n
-Description: ${relevantTemplatePart.description}\n
-The Readme Template: ${JSON.stringify(template)}
-Use the project details and file list to create an accurate and detailed description. Just return the description, not the title. Don't mention too many unnecessary files or folders like node_modules or ts configs.`;
-};
+import { NextApiRequest, NextApiResponse } from 'next';
+import { OpenAI } from 'openai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import LlamaAI from 'llamaai';
+import path from 'path';
+import fs from 'fs';
+import { getPromptWithFiles } from '../../services/fileSearch'; // Import the functions
 
 const handleAPIRequest = async (req: NextApiRequest, res: NextApiResponse) => {
   const { model } = req.query;
   const { prompt, apiKey, part, template } = req.body;
   const projectDir = path.resolve(process.cwd(), prompt.directory);
 
-  if (req.method !== "POST") {
-    res.status(405).json({ error: "Method Not Allowed" });
+  if (req.method !== 'POST') {
+    res.status(405).json({ error: 'Method Not Allowed' });
     return;
   }
 
@@ -104,28 +22,28 @@ const handleAPIRequest = async (req: NextApiRequest, res: NextApiResponse) => {
     let response, result;
 
     switch (model) {
-      case "gpt-3.5-turbo":
+      case 'gpt-3.5-turbo':
         const openai = new OpenAI({ apiKey });
         response = await openai.chat.completions.create({
           model: model,
-          messages: [{ role: "user", content: fullPrompt }],
+          messages: [{ role: 'user', content: fullPrompt }],
           max_tokens: 150,
         });
-        result = response.choices[0].message?.content || "";
+        result = response.choices[0].message?.content || '';
         break;
 
-      case "gemini-1.5-flash":
+      case 'gemini-1.5-flash':
         const genAI = new GoogleGenerativeAI(apiKey);
         response = await genAI
-          .getGenerativeModel({ model: "gemini-1.5-flash" })
+          .getGenerativeModel({ model: 'gemini-1.5-flash' })
           .generateContent(fullPrompt);
         result = await response.response.text();
         break;
 
-      // case "llama3-70b":
+      // case 'llama3-70b':
       //   const llamaAPI = new LlamaAI({ apiKey });
       //   response = await llamaAPI.generate({
-      //     model: "llama3-70b",
+      //     model: 'llama3-70b',
       //     prompt: fullPrompt,
       //     maxTokens: 150,
       //   });
@@ -133,22 +51,20 @@ const handleAPIRequest = async (req: NextApiRequest, res: NextApiResponse) => {
       //   break;
 
       default:
-        res.status(400).json({ error: "Invalid model" });
+        res.status(400).json({ error: 'Invalid model' });
         return;
     }
 
     const jsonFilePath = path.join(
       process.cwd(),
-      "renderer",
-      "public",
-      `${prompt.title}.json`
+      'renderer', 'public', `${prompt.title}.json`
     );
 
     let templateData = [{ headings: [] }];
 
     if (fs.existsSync(jsonFilePath)) {
       templateData = JSON.parse(
-        fs.readFileSync(jsonFilePath, "utf8") || "[{ headings: [] }]"
+        fs.readFileSync(jsonFilePath, 'utf8') || '[{ headings: [] }]'
       );
     }
 
@@ -162,7 +78,7 @@ const handleAPIRequest = async (req: NextApiRequest, res: NextApiResponse) => {
       templateData[0].headings.push({ title: part, description: result });
     }
 
-    const publicDir = path.join(process.cwd(), "renderer", "public");
+    const publicDir = path.join(process.cwd(), 'renderer', 'public');
     if (!fs.existsSync(publicDir)) {
       fs.mkdirSync(publicDir);
     }
@@ -171,8 +87,8 @@ const handleAPIRequest = async (req: NextApiRequest, res: NextApiResponse) => {
 
     res.status(200).json({ response: JSON.stringify(templateData, null, 2) });
   } catch (error) {
-    console.error("Error while handling request:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    console.error('Error while handling request:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 };
 
