@@ -52,7 +52,24 @@ const ChatPage: React.FC = () => {
   const [template, setTemplate] = useState<number>(0);
   const [Generate, setGenerate] = useState(false);
   const handleModelChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setSelectedModel(event.target.value);
+    const model = event.target.value;
+    setSelectedModel(model);
+    switch (model) {
+      case "gpt-3.5-turbo":
+        setApiKey(process.env.OPENAI_API_KEY)
+        break;
+      case "gemini-1.5-flash":
+        setApiKey(process.env.GEMINI_API_KEY)
+        break;
+      case "llama3-70b":
+        setApiKey(process.env.LLAMA_API_KEY)
+        break;
+      case "claude-3-5-sonnet-20240620":
+        setApiKey(process.env.CLAUDE_API_KEY)
+        break;
+      default:
+        break;
+    }
   };
   const [save, setSave] = useState(false);
   const streamFileData = async () => {
@@ -217,19 +234,13 @@ const ChatPage: React.FC = () => {
           value={selectedModel}
           onChange={handleModelChange}
         >
-          <option disabled value="gpt-3.5-turbo">
+          <option  value="gpt-3.5-turbo">
             gpt-3.5-turbo
           </option>
           <option value="gemini-1.5-flash">gemini-1.5-flash</option>
           <option value="llama3-70b">llama3-70b</option>
-          <option disabled value="perplexity">
-            Perplexity
-          </option>
-          <option disabled value="claude">
+          <option value="claude-3-5-sonnet-20240620">
             Claude
-          </option>
-          <option disabled value="gooseai">
-            GooseAI
           </option>
         </select>
         <input
