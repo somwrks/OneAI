@@ -186,6 +186,7 @@ const ChatPage: React.FC = () => {
   };
 
   const handleSendQuestion = async () => {
+    console.log(apiKey)
     setLoading(true);
 
     const tasks = templates.flatMap((t) =>
