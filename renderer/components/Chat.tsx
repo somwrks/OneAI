@@ -134,8 +134,13 @@ const ChatPage: React.FC = () => {
           title: prompt.title,
         }),
       });
+      const response1 = await fetch(`/api/deletejson`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ file: prompt.title }),
+      });
 
-      if (response.ok && !loading) {
+      if (response.ok &&response1.ok && !loading) {
         setSave(true);
         setLoading(false);
       }
@@ -143,18 +148,6 @@ const ChatPage: React.FC = () => {
   };
 
   const handleQuit = async () => {
-    setLoading(true);
-
-    try {
-      const response = await fetch(`/api/deletejson`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ file: prompt.title }),
-      });
-    } catch (error) {
-      alert("Invalid API Key" + error);
-    }
-    setLoading(false);
 
     window.ipc.openDirectory(prompt.directory);
 
@@ -172,9 +165,16 @@ const ChatPage: React.FC = () => {
   };
 
   const handleSendQuestion = async () => {
-    console.log(apiKey);
     setLoading(true);
-
+    const response = await fetch(`/api/refine`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({prompt,apiKey}),
+    });
+    if (response.ok) {
+      const data1 = await response.json();
+      console.log(data1)
+    }
     const tasks = templates.flatMap((t) =>
       t.headings.map(async (text) => {
         const requestBody = {
@@ -208,6 +208,7 @@ const ChatPage: React.FC = () => {
     setRegenerate(true);
   };
 
+  console.log(JSON.stringify(prompt))
   return (
     <div>
       {loading && <LoadingOverlay />}

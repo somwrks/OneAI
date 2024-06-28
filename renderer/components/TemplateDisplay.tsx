@@ -28,9 +28,9 @@ const TemplateDisplay: React.FC<TemplateDisplayProps> = ({
       <div className="flex flex-row w-full justify-between">
         <div className="flex flex-col w-full">
           <button
-            className="p-3 bg-gray-700 w-full "
-            onClick={() => {
-              setStart(false);
+            className="p-3 bg-gray-700 w-full cursor-pointer "
+            onClick={ () => {
+              !regenerate && setStart(false);
             }}
           >
             Go back
@@ -74,14 +74,14 @@ const TemplateDisplay: React.FC<TemplateDisplayProps> = ({
                     {subIndex == t.headings.length - 1 && (
                       <>
                         <button
-                          className="p-3 bg-gray-500 w-1/5 rounded-md"
+                          className="p-3 bg-gray-500 cursor-pointer w-1/5 rounded-md"
                           onClick={handleSendQuestion}
                         >
                           {regenerate ? "Regenerate" : "Generate"}
                         </button>
                         {regenerate && (
                           <button
-                            className="p-3 bg-gray-500 w-1/5 rounded-md"
+                            className="p-3 bg-gray-500 w-1/5 cursor-pointer rounded-md"
                             onClick={handleSave}
                           >
                             Save

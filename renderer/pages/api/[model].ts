@@ -28,6 +28,7 @@ const traverseDirectory = (dir: string, fileList: string[] = []) => {
       ".mp3",
       ".mp4",
       ".webp",
+      ".gif",
       ".svg",
       ".ico",
       ".jpeg",
