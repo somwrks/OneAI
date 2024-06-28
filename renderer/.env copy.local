@@ -1,3 +1,6 @@
 # duplicate this file and rename it to .env.local
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_dW5pcXVlLWdvYmxpbi04Mi5jbGVyay5hY2NvdW50cy5kZXYk
 CLERK_SECRET_KEY=sk_test_rf4pOIv7xiAncIKYlDbrzUiOHORXw9UGiGQoivIeOp
+OPENAI_API_KEY=
+GEMINI_API_KEY=AIzaSyAvKFXxE6NpWk2Kb1x-9hhXHROKD8w6Y7o
+LLAMA_API_KEY=
