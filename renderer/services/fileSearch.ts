@@ -1,6 +1,6 @@
-// fileSearch.ts
 import fs from 'fs';
 import path from 'path';
+import fetch from 'node-fetch';
 
 const EXCLUDE_FILES = [
   'node_modules', '.vscode', 'app', 'dist', '.next', '.git', 'README.md',
@@ -33,23 +33,55 @@ export const traverseDirectory = (dir: string, fileList: string[] = []) => {
   return fileList;
 };
 
-export const getPromptWithFiles = (
+export const getPromptWithFiles = async (
   prompt: any, template: any, part: string, directory: string
 ) => {
-  const fileList = traverseDirectory(directory);
-  let fileListString = '';
+  const isGitHub = directory.includes("https://github.com");
 
-  fileList.forEach((filePath) => {
-    const fileName = path.basename(filePath);
-    const fileContent = fs.readFileSync(filePath, 'utf-8');
-    const fileLines = fileContent.split('\n');
-    const snippet = fileLines.length > 5
-      ? fileLines.slice(0, 5).join('\n') + '\n...'
-      : fileLines.join('\n');
-    fileListString += `${fileName}\n${snippet}\n\n`;
-  });
+  let fileList: string[], fileListString = '', relevantTemplatePart;
 
-  const relevantTemplatePart = template.headings.find(
+  if (isGitHub) {
+    const response = await fetch(`${process.env.BASE_URL}/api/fetchRepo`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ repoLink: directory }),
+    });
+    const files = await response.json();
+    console.log(files)
+    for (const file of files) {
+      
+      if (file.type === "file") {
+        const shouldExclude =
+          EXCLUDE_FILES.includes(file.name) ||
+          EXCLUDE_EXTENSIONS.some((ext) => file.name.endsWith(ext)) ||
+          EXCLUDE_PATTERNS.some((pattern) => pattern.test(file.name));
+
+        if (!shouldExclude) {
+          const fileContentResponse = await fetch(file.download_url);
+          const content = await fileContentResponse.text();
+          const fileLines = content.split('\n');
+          const snippet = fileLines.length > 5
+            ? fileLines.slice(0, 5).join('\n') + '\n...'
+            : fileLines.join('\n');
+          fileListString += `${file.path}\n${snippet}\n\n`;
+        }
+      }
+    }
+  } else {
+    
+    fileList = traverseDirectory(directory);
+    fileList.forEach((filePath) => {
+      const fileName = path.basename(filePath);
+      const fileContent = fs.readFileSync(filePath, 'utf-8');
+      const fileLines = fileContent.split('\n');
+      const snippet = fileLines.length > 5
+        ? fileLines.slice(0, 5).join('\n') + '\n...'
+        : fileLines.join('\n');
+      fileListString += `${fileName}\n${snippet}\n\n`;
+    });
+  }
+
+  relevantTemplatePart = template.headings.find(
     (heading: any) => heading.title === part
   );
 

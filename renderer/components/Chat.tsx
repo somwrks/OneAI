@@ -149,7 +149,7 @@ const ChatPage: React.FC = () => {
 
   const handleQuit = async () => {
 
-    window.ipc.openDirectory(prompt.directory);
+    window.ipc?.openDirectory(prompt.directory);
 
     setStart(false);
     setRegenerate(false);
@@ -167,6 +167,8 @@ const ChatPage: React.FC = () => {
 
   const handleSendQuestion = async () => {
     setLoading(true);
+
+
     const response1 = await fetch(`/api/refine`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -208,7 +210,37 @@ const ChatPage: React.FC = () => {
     setLoading(false);
     setRegenerate(true);
   };
+//   const fetchRepoFiles = async (repoLink: string) => {
+//     try {
+//       const response = await fetch(`/api/fetchRepo`, {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify({ repoLink }),
+//       });
+//       if (response.ok) {
+//         const files = await response.json();
+//         let fileListString = '';
 
+//         for (const file of files) {
+//           if (file.type === "file") {
+//             const fileContent = await fetch(file.download_url);
+//             const content = await fileContent.text();
+//             const fileLines = content.split('\n');
+//             const snippet = fileLines.length > 5
+//               ? fileLines.slice(0, 5).join('\n') + '\n...'
+//               : fileLines.join('\n');
+//             fileListString += `${file.path}\n${snippet}\n\n`;
+//           }
+//         }
+// console.log(fileListString)
+//         const updatedPrompt = { ...prompt, fileListString };
+//         setPrompt(updatedPrompt);
+//       }
+//     } catch (error) {
+//       console.error("Error fetching repository files:", error);
+//     }
+//   };
+  
   return (
     <div>
       {loading && <LoadingOverlay />}

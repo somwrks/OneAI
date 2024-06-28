@@ -32,7 +32,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       console.error("Error while handling request:", error);
       res.status(500).json({ error: "Internal Server Error" });
     }
-    console.log("returned raw result : " + result)
     res.status(200).json({response: result});
 
   } else {

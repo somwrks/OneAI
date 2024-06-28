@@ -50,7 +50,7 @@ const PromptForm: React.FC<PromptFormProps> = ({ prompt, setPrompt, setStart }) 
         <input
           className="p-2"
           type="text"
-          placeholder="Directory of Project"
+          placeholder="Directory of Project | Github URL"
           value={prompt.directory}
           onChange={(e) =>
             setPrompt({ ...prompt, directory: e.target.value })
