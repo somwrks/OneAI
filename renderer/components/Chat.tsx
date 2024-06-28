@@ -166,15 +166,15 @@ const ChatPage: React.FC = () => {
 
   const handleSendQuestion = async () => {
     setLoading(true);
-    const response = await fetch(`/api/refine`, {
+    const response1 = await fetch(`/api/refine`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({prompt,apiKey}),
     });
-    if (response.ok) {
-      const data1 = await response.json();
-      console.log(data1)
-    }
+      const data1 = await response1.json();
+      const nestedJson = JSON.parse(data1.response.replace(/```json|```/g, ''));
+      setPrompt(nestedJson)
+      console.log("refined prompt" , prompt)
     const tasks = templates.flatMap((t) =>
       t.headings.map(async (text) => {
         const requestBody = {
@@ -208,7 +208,6 @@ const ChatPage: React.FC = () => {
     setRegenerate(true);
   };
 
-  console.log(JSON.stringify(prompt))
   return (
     <div>
       {loading && <LoadingOverlay />}

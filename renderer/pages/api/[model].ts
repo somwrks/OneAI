@@ -163,7 +163,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       }
 
       fs.writeFileSync(jsonFilePath, JSON.stringify(templateData, null, 2));
-      console.log(templateData)
+      // console.log(templateData)
 
       res.status(200).json({ response: JSON.stringify(templateData, null, 2) });
     } catch (error) {
