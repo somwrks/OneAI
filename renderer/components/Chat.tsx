@@ -1,23 +1,11 @@
-import React, { useState, useEffect, ChangeEvent } from "react";
+import React, { ChangeEvent, useState } from "react";
 import templates from "../public/template.json";
-import useTypingAnimation from "./useTypingAnimation ";
-import AnimatedText from "./AnimatedText";
+import ModelSelector from "./ModelSelector";
+import PromptForm from "./PromptForm";
+import TemplateDisplay from "./TemplateDisplay";
+import LoadingOverlay from "./LoadingOverlay";
 import { SignOutButton } from "@clerk/clerk-react";
-type Prompt = {
-  title: string;
-  type: string;
-  techstack: string;
-  purpose: string;
-  directory: string;
-};
-type Heading = {
-  title: string;
-  description: string;
-};
-
-type ReadmeData = {
-  headings: Heading[];
-};
+import { Prompt, ReadmeData } from "./types";
 
 const initialReadme: ReadmeData[] = [
   {
@@ -32,13 +20,11 @@ const initialReadme: ReadmeData[] = [
     ],
   },
 ];
+
 const ChatPage: React.FC = () => {
   const [typedDescription, setTypedDescription] = useState("");
-
-  const [selectedModel, setSelectedModel] =
-    useState<string>("gemini-1.5-flash");
+  const [selectedModel, setSelectedModel] = useState<string>("gemini-1.5-flash");
   const [loading, setLoading] = useState(false);
-
   const [readme, setReadme] = useState<ReadmeData[]>(initialReadme);
   const [prompt, setPrompt] = useState<Prompt>({
     title: "",
@@ -50,28 +36,48 @@ const ChatPage: React.FC = () => {
   const [regenerate, setRegenerate] = useState(false);
   const [start, setStart] = useState(false);
   const [template, setTemplate] = useState<number>(0);
-  const [Generate, setGenerate] = useState(false);
+  const [generate, setGenerate] = useState(false);
+  const [apiKey, setApiKey] = useState<string>(process.env.GEMINI_API_KEY || "");
+  const [save, setSave] = useState(false);
+
   const handleModelChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const model = event.target.value;
     setSelectedModel(model);
     switch (model) {
       case "gpt-3.5-turbo":
-        setApiKey(process.env.OPENAI_API_KEY)
+        setApiKey(process.env.OPENAI_API_KEY);
         break;
       case "gemini-1.5-flash":
-        setApiKey(process.env.GEMINI_API_KEY)
+        setApiKey(process.env.GEMINI_API_KEY);
         break;
       case "llama3-70b":
-        setApiKey(process.env.LLAMA_API_KEY)
+        setApiKey(process.env.LLAMA_API_KEY);
         break;
       case "claude-3-5-sonnet-20240620":
-        setApiKey(process.env.CLAUDE_API_KEY)
+        setApiKey(process.env.CLAUDE_API_KEY);
         break;
       default:
         break;
     }
   };
-  const [save, setSave] = useState(false);
+
+  const handleTypingEffect = (data: ReadmeData[]) => {
+    const fullText =
+      data[0]?.headings.map((heading) => heading.description).join("\n") || "";
+    let index = 0;
+
+    const intervalId = setInterval(() => {
+      if (index < fullText.length) {
+        setTypedDescription((prev) => prev + fullText[index]);
+        index++;
+      } else {
+        clearInterval(intervalId);
+      }
+    }, 50); // Adjust typing speed here
+
+    setReadme(data);
+  };
+
   const streamFileData = async () => {
     setLoading(true);
     try {
@@ -111,31 +117,11 @@ const ChatPage: React.FC = () => {
         setLoading(false);
       }
     } catch (error) {
-      alert("Error while recieving question:" + error);
+      alert("Error while receiving question:" + error);
       setLoading(false);
     }
   };
 
-  const handleTypingEffect = (data: ReadmeData[]) => {
-    const fullText =
-      data[0]?.headings.map((heading) => heading.description).join("\n") || "";
-    let index = 0;
-
-    const intervalId = setInterval(() => {
-      if (index < fullText.length) {
-        setTypedDescription((prev) => prev + fullText[index]);
-        index++;
-      } else {
-        clearInterval(intervalId);
-      }
-    }, 50); // Adjust typing speed here
-
-    setReadme(data);
-  };
-
-  const [apiKey, setApiKey] = useState<string>(
-    process.env.GEMINI_API_KEY || ""
-  );
   const handleSave = async () => {
     setLoading(true);
     try {
@@ -156,7 +142,7 @@ const ChatPage: React.FC = () => {
     } catch (error) {}
   };
 
-  const handlequit = async () => {
+  const handleQuit = async () => {
     setLoading(true);
 
     try {
@@ -186,7 +172,7 @@ const ChatPage: React.FC = () => {
   };
 
   const handleSendQuestion = async () => {
-    console.log(apiKey)
+    console.log(apiKey);
     setLoading(true);
 
     const tasks = templates.flatMap((t) =>
@@ -212,7 +198,7 @@ const ChatPage: React.FC = () => {
             setRegenerate(false);
           }
         } catch (error) {
-          alert("Error with api key");
+          alert("Error with API key");
         }
       })
     );
@@ -224,182 +210,43 @@ const ChatPage: React.FC = () => {
 
   return (
     <div>
-      {loading && (
-        <div className="flex flex-col top-0 min-h-screen w-full backdrop-blur-sm items-center justify-center text-center text-white fixed z-50">
-          Loading...
-        </div>
-      )}
+      {loading && <LoadingOverlay />}
       <div className="flex flex-col w-full items-center h-full gap-5 p-5">
-        <select
-          className="bg-gray-700 w-2/3 p-3"
-          value={selectedModel}
-          onChange={handleModelChange}
-        >
-          <option  value="gpt-3.5-turbo">
-            gpt-3.5-turbo
-          </option>
-          <option value="gemini-1.5-flash">gemini-1.5-flash</option>
-          <option value="llama3-70b">llama3-70b</option>
-          <option value="claude-3-5-sonnet-20240620">
-            Claude
-          </option>
-        </select>
-        <input
-          className="bg-gray-700 w-2/3 p-3"
-          type="text"
-          placeholder="Enter API KEY"
-          value={apiKey}
-          disabled={!Generate && regenerate}
-          onChange={(e) => setApiKey(e.target.value)}
+        <ModelSelector
+          selectedModel={selectedModel}
+          handleModelChange={handleModelChange}
+          apiKey={apiKey}
+          setApiKey={setApiKey}
+          generate={generate}
+          regenerate={regenerate}
         />
         <div className="flex flex-col w-2/3 items-center gap-y-5">
           {start ? (
             !save ? (
-              <>
-                <div className="flex flex-row w-full justify-between">
-                  <div className="flex flex-col w-full">
-                    <button
-                      className="p-3 bg-gray-700 w-full "
-                      onClick={() => {
-                        setStart(false);
-                      }}
-                    >
-                      Go back
-                    </button>
-                  </div>
-                  <div className="flex w-full">
-                    <select
-                      className="bg-gray-700 w-full p-3"
-                      value={template}
-                      onChange={(e) => setTemplate(Number(e.target.value))}
-                    >
-                      {templates.map((_, i) => (
-                        <option key={i} value={i}>
-                          Template {i}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-                {templates.map((t, index) =>
-                  index === template ? (
-                    <div key={index}>
-                      {t.headings.map((text, subIndex) => {
-                        const description =
-                          readme[index]?.headings.find(
-                            (e) => e.title === text.title
-                          )?.description || text.description;
-const condition = readme[index]?.headings.find(
-  (e) => e.title === text.title
-)?.description? true: false;
-                        return (
-                          <div key={subIndex} className="flex-col flex gap-y-5">
-                            <div className="flex text-2xl">{text.title}</div>
-                            <div className="flex text-md border text-gray-300 border-gray-600 p-4">
-                              <p style={{ whiteSpace: "pre-wrap" }}>
-                                {condition ? 
-                                <AnimatedText text={description} />
-                                : description} 
-                              </p>
-                            </div>
-                            <div className="flex flex-col space-y-12 items-end w-full">
-                              {subIndex == t.headings.length - 1 && (
-                                <>
-                                  <button
-                                    className="p-3 bg-gray-500 w-1/5 rounded-md"
-                                    onClick={handleSendQuestion}
-                                  >
-                                    {regenerate ? "Regenrate" : "Generate"}
-                                  </button>
-                                  {regenerate && (
-                                    <button
-                                      className="p-3 bg-gray-500 w-1/5 rounded-md"
-                                      onClick={handleSave}
-                                    >
-                                      Save
-                                    </button>
-                                  )}
-                                </>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ) : null
-                )}
-              </>
+              <TemplateDisplay
+              setStart={setStart}
+                template={template}
+                setTemplate={setTemplate}
+                templates={templates}
+                readme={readme}
+                handleSendQuestion={handleSendQuestion}
+                handleSave={handleSave}
+                regenerate={regenerate}
+              />
             ) : (
               <button
                 className="p-3 bg-gray-500 w-1/5 rounded-md"
-                onClick={handlequit}
+                onClick={handleQuit}
               >
                 Open Saved File
               </button>
             )
           ) : (
-            <>
-              <div className="flex-col w-full flex gap-y-4 text-blue-800 text-xl">
-                <input
-                  className="p-2"
-                  type="text"
-                  placeholder="Project Title"
-                  value={prompt.title}
-                  onChange={(e) =>
-                    setPrompt({ ...prompt, title: e.target.value })
-                  }
-                />
-                <input
-                  className="p-2"
-                  type="text"
-                  placeholder="Type of Project"
-                  value={prompt.type}
-                  onChange={(e) =>
-                    setPrompt({ ...prompt, type: e.target.value })
-                  }
-                />
-                <input
-                  className="p-2"
-                  type="text"
-                  placeholder="Purpose of Project"
-                  value={prompt.purpose}
-                  onChange={(e) =>
-                    setPrompt({ ...prompt, purpose: e.target.value })
-                  }
-                />
-                <input
-                  className="p-2"
-                  type="text"
-                  placeholder="Techstack of Project"
-                  value={prompt.techstack}
-                  onChange={(e) =>
-                    setPrompt({ ...prompt, techstack: e.target.value })
-                  }
-                />
-                <input
-                  className="p-2"
-                  type="text"
-                  placeholder="Directory of Project"
-                  value={prompt.directory}
-                  onChange={(e) =>
-                    setPrompt({ ...prompt, directory: e.target.value })
-                  }
-                />
-                <div className="flex p-2 bg-white flex-col w-full ">
-                <SignOutButton />
-
-                </div>
-              </div>
-              {Object.values(prompt).every((value) => value.trim() !== "") && (
-                <button
-                  onClick={() => setStart(true)}
-                  className="p-3 bg-gray-500 w-1/5 rounded-md"
-                >
-                  Next
-                </button>
-              )}
-            </>
+            <PromptForm prompt={prompt} setPrompt={setPrompt} setStart={setStart} />
           )}
+        </div>
+        <div className="flex p-2 bg-white flex-col w-full ">
+          <SignOutButton />
         </div>
       </div>
     </div>
