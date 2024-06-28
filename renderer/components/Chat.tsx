@@ -134,6 +134,21 @@ const ChatPage: React.FC = () => {
           title: prompt.title,
         }),
       });
+      if (prompt.directory.includes("https://github.com")) {
+        // Handle GitHub case: prompt the user to download the file
+        const blob = await response.blob();
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = downloadUrl;
+        a.download = "README.md";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(downloadUrl);
+      } else {
+        // Handle local directory case
+        alert("Readme file created successfully!");
+      }
       const response1 = await fetch(`/api/deletejson`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
