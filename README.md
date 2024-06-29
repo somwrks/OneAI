@@ -10,9 +10,13 @@
 
 This is a desktop application where user can login in a secured environment to select from various ai models such as Openai, Llama, Gemini, Claude, Perplexity,  upon entering their apikeys, user can provide directory to their project, user can select from various templates present for readme then ai would do the job to build the readme out of it for the project, user can save the readme file on their computer aswell. The application is built using NextronJS, ElectronJS, TailwindCSS and utilizes APIs from Clerk, Openai, Gemini, Claude, Llama and Perplexity to generate README files.
 
-### Update: 
+## Contribute
 
-Disabled Clerk Login for build process, you can now download exe file  [MIT License](https://github.com/somwrks/OneAI/tree/master/dist/My Nextron App Setup 1.0.0)
+1. Ensure all dependencies are installed. You can install all dependencies by running `npm install` in the project's root directory.
+2. Create a duplicate file of `.env copy.local` and rename it to .env.local
+3. Enter your API keys and base url into the env file.
+4. Build the application by running `npm run build` in the project's root directory.
+5. Launch the application by running `npm run dev` in the project's root directory.
 
 ## Overview
 
@@ -62,7 +66,6 @@ The key components of the code include:
 - **Readme Template Selection:** Users can choose from a collection of pre-defined Readme templates, ensuring their Readme files adhere to best practices and conventions.
 - **Readme Generation:** The application leverages the selected AI model to automatically generate a high-quality Readme file based on the user's project directory and chosen template.
 - **Readme File Saving:** Users can conveniently save the generated Readme file to their computer for easy access and sharing. 
-
 
 ## Folder Structure
 
