@@ -27,8 +27,62 @@ const PromptForm: React.FC<PromptFormProps> = ({ prompt, setPrompt, setStart }) 
   const [backend, setBackend] = useState("");
   const [database, setDatabase] = useState("");
   const [otherFrameworks, setOtherFrameworks] = useState("");
+  const [error, setError] = useState("");
 
-  const handleNext = () => {
+  const checkDirectoryExists = async(directory: string): Promise<boolean> => {
+    try {
+      const response = await fetch(`${process.env.BASE_URL}/api/checkdir`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ directory }),
+      });
+
+      if (!response.ok) {
+        return false;
+      } 
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  const checkGithubRepoExists = async (repoLink: string): Promise<boolean> => {
+    try {
+      const response = await fetch(`${process.env.BASE_URL}/api/fetchRepo`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ repoLink }),
+      });
+
+      if (!response.ok) {
+        return false;
+      } 
+
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  const handleNext = async () => {
+    const isGithub = prompt.directory.includes("https://github.com");
+
+    let directoryExists = false;
+    if (isGithub) {
+      directoryExists = await checkGithubRepoExists(prompt.directory);
+    } else {
+      directoryExists = await checkDirectoryExists(prompt.directory);
+    }
+
+    if (!directoryExists) {
+      setError("Directory does not exist. Please enter a valid directory.");
+      return;
+    }
+
     const techstack = `Frontend - ${frontend}, Backend - ${backend}, Database - ${database}, Other Frameworks/APIs - ${otherFrameworks}`;
     setPrompt({ ...prompt, techstack });
     setStart(true);
@@ -112,6 +166,7 @@ const PromptForm: React.FC<PromptFormProps> = ({ prompt, setPrompt, setStart }) 
         <input
           className="p-2"
           type="text"
+          required
           placeholder="Directory of Project | Github URL"
           value={prompt.directory}
           onChange={(e) =>
@@ -130,12 +185,14 @@ const PromptForm: React.FC<PromptFormProps> = ({ prompt, setPrompt, setStart }) 
         <input
           className="p-2"
           type="text"
+          required
           placeholder="Cannot Contribute | Ask to Contribute | How to contribute"
           value={prompt.contribute}
           onChange={(e) =>
             setPrompt({ ...prompt, contribute: e.target.value })
           }
         />
+        {error && <div className="text-red-500">{error}</div>}
       </div>
       {Object.values(prompt).some((value) => value.trim() !== "") && frontend && backend && database && (
         <button

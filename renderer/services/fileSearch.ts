@@ -1,3 +1,4 @@
+
 import fs from 'fs';
 import path from 'path';
 import fetch from 'node-fetch';
@@ -8,7 +9,7 @@ const EXCLUDE_FILES = [
 
 const EXCLUDE_EXTENSIONS = [
   '.sample', '.md', '.png', '.mp3', '.mp4', '.webp', '.gif', '.svg', '.ico', '.jpeg', '.jpg',
-];
+]; 
 
 const EXCLUDE_PATTERNS = [
   /COMMIT_EDITMSG/, /FETCH_HEAD/, /HEAD/, /^[0-9a-f]{40}$/, // Matches commit hashes
