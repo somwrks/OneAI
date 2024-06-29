@@ -3,7 +3,7 @@ import path from 'path';
 import fetch from 'node-fetch';
 
 const EXCLUDE_FILES = [
-  'node_modules', '.vscode', 'app', 'dist', '.next', '.git', 'README.md',
+  'node_modules', '.vscode', 'dist', '.next', '.git', 'README.md',
 ];
 
 const EXCLUDE_EXTENSIONS = [

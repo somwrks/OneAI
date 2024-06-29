@@ -42,9 +42,9 @@ const TemplateDisplay: React.FC<TemplateDisplayProps> = ({
             value={template}
             onChange={(e) => setTemplate(Number(e.target.value))}
           >
-            {templates.map((_, i) => (
+            {templates.map((e, i) => (
               <option key={i} value={i}>
-                Template {i}
+                {e.name}
               </option>
             ))}
           </select>
