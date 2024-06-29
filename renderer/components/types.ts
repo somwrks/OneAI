@@ -3,8 +3,10 @@ export type Prompt = {
     type: string;
     techstack: string;
     purpose: string;
+    features: string;
     directory: string;
     contribute: string;
+    
   };
   
   export type Heading = {
@@ -13,6 +15,7 @@ export type Prompt = {
   };
   
   export type ReadmeData = {
+    name: string,
     headings: Heading[];
   };
   

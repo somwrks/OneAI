@@ -1,5 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
 import { Prompt } from "./types";
+
+const frontendOptions = {
+  Website: ["Next.js", "React", "Vue", "Angular"],
+  Mobile_App: ["React Native", "Flutter", "Ionic"]
+};
+
+const backendOptions = {
+  Website: ["Node.js", "Django", "Flask", "Serverless"],
+  Mobile_App: ["Node.js", "Django", "Flask", "Serverless"]
+};
+
+const databaseOptions = {
+  Website: ["Firebase", "PostgreSQL", "NoSQL", "MongoDB", "None"],
+  Mobile_App: ["Firebase", "PostgreSQL", "NoSQL", "MongoDB", "None"]
+};
 
 type PromptFormProps = {
   prompt: Prompt;
@@ -8,6 +23,17 @@ type PromptFormProps = {
 };
 
 const PromptForm: React.FC<PromptFormProps> = ({ prompt, setPrompt, setStart }) => {
+  const [frontend, setFrontend] = useState("");
+  const [backend, setBackend] = useState("");
+  const [database, setDatabase] = useState("");
+  const [otherFrameworks, setOtherFrameworks] = useState("");
+
+  const handleNext = () => {
+    const techstack = `Frontend - ${frontend}, Backend - ${backend}, Database - ${database}, Other Frameworks/APIs - ${otherFrameworks}`;
+    setPrompt({ ...prompt, techstack });
+    setStart(true);
+  };
+
   return (
     <>
       <div className="flex-col w-full flex gap-y-4 text-blue-800 text-md">
@@ -20,15 +46,60 @@ const PromptForm: React.FC<PromptFormProps> = ({ prompt, setPrompt, setStart }) 
             setPrompt({ ...prompt, title: e.target.value })
           }
         />
-        <input
+        <select
           className="p-2"
-          type="text"
-          placeholder="Type of Project"
           value={prompt.type}
           onChange={(e) =>
             setPrompt({ ...prompt, type: e.target.value })
           }
-        />
+        >
+          <option value="" disabled>Select Type of Project</option>
+          <option value="Website">Website</option>
+          <option value="Mobile_App">Mobile App</option>
+        </select>
+        {prompt.type && (
+          <>
+            <select
+              className="p-2"
+              value={frontend}
+              onChange={(e) => setFrontend(e.target.value)}
+            >
+              <option value="" disabled>Select Frontend</option>
+              {frontendOptions[prompt.type].map((option) => (
+                <option key={option} value={option}>{option}</option>
+              ))}
+            </select>
+            <select
+              className="p-2"
+              value={backend}
+              onChange={(e) => setBackend(e.target.value)}
+            >
+              <option value="" disabled>Select Backend</option>
+              {backendOptions[prompt.type].map((option) => (
+                <option key={option} value={option}>{option}</option>
+              ))}
+            </select>
+            <select
+              className="p-2"
+              value={database}
+              onChange={(e) => setDatabase(e.target.value)}
+            >
+              <option value="" disabled>Select Database</option>
+              {databaseOptions[prompt.type].map((option) => (
+                <option key={option} value={option}>{option}</option>
+              ))}
+            </select>
+            <input
+              className="p-2"
+              type="text"
+              placeholder="Other Frameworks or APIs"
+              value={otherFrameworks}
+              onChange={(e) =>
+                setOtherFrameworks(e.target.value)
+              }
+            />
+          </>
+        )}
         <input
           className="p-2"
           type="text"
@@ -36,15 +107,6 @@ const PromptForm: React.FC<PromptFormProps> = ({ prompt, setPrompt, setStart }) 
           value={prompt.purpose}
           onChange={(e) =>
             setPrompt({ ...prompt, purpose: e.target.value })
-          }
-        />
-        <input
-          className="p-2"
-          type="text"
-          placeholder="Techstack of Project"
-          value={prompt.techstack}
-          onChange={(e) =>
-            setPrompt({ ...prompt, techstack: e.target.value })
           }
         />
         <input
@@ -59,16 +121,25 @@ const PromptForm: React.FC<PromptFormProps> = ({ prompt, setPrompt, setStart }) 
         <input
           className="p-2"
           type="text"
-          placeholder="Cannot Contribute | Ask to Contrbute | How to contribute"
+          placeholder="Features"
+          value={prompt.features}
+          onChange={(e) =>
+            setPrompt({ ...prompt, features: e.target.value })
+          }
+        />
+        <input
+          className="p-2"
+          type="text"
+          placeholder="Cannot Contribute | Ask to Contribute | How to contribute"
           value={prompt.contribute}
           onChange={(e) =>
             setPrompt({ ...prompt, contribute: e.target.value })
           }
         />
       </div>
-      {Object.values(prompt).every((value) => value.trim() !== "") && (
+      {Object.values(prompt).some((value) => value.trim() !== "") && frontend && backend && database && (
         <button
-          onClick={() => setStart(true)}
+          onClick={handleNext}
           className="p-3 bg-gray-500 w-1/5 cursor-pointer rounded-md"
         >
           Next

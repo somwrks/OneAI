@@ -9,12 +9,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     console.log("recieved prompt on /refine " + prompt)
     const fullPrompt=`You are an AI Prompt Refiner, Your Job is to refine the prompts for future ai agents. Make sure you keep the variable names same but the values as required for refining. Don't change the title and directory variable values of the json. 
      Example case-
-     Requested prompt : {"title":"Leetcode Marathon","type":"Competitive Programming","techstack":"python","purpose":"to add all those questions that i tackle on web to crack faang companies","contribute":"you can contribute","directory":"/home/som/leetcode"}\n
-     Refined prompt : {"title":"Leetcode Marathon","type": "Competitive Programming and Algorithm Practice",
-  "techstack": "Python 3",
+     Requested prompt : {"title":"Leetcode Marathon","type":"Website","techstack":"python","purpose":"to add all those questions that i tackle on web to crack faang companies","contribute":"you can contribute","features": "none","directory":"/home/som/leetcode"}\n
+     Refined prompt : {"title":"Leetcode Marathon","type": "Website",
+  "techstack": "Python 3", "features":"none",
   "purpose": "To systematically tackle and document LeetCode problems commonly asked in FAANG company interviews, focusing on data structures and algorithms","contribute":"Contributions to this project are welcome! If you have any suggestions, improvements, or bug fixes, please feel free to create issues or pull requests","directory":"/home/som/leetcode"}
-  
-  
   Now refine this prompt according to the rules described above and return the json object text.:
   ${JSON.stringify(prompt, null, 2)}
   `

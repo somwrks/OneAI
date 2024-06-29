@@ -9,6 +9,7 @@ import { Prompt, ReadmeData } from "./types";
 
 const initialReadme: ReadmeData[] = [
   {
+    name:"",
     headings: [
       { title: "# Title", description: "" },
       { title: "## Overview", description: "" },
@@ -32,6 +33,7 @@ const ChatPage: React.FC = () => {
     purpose: "",
     contribute: "",
     directory: "",
+    features:"",
   });
   const [regenerate, setRegenerate] = useState(false);
   const [start, setStart] = useState(false);
@@ -135,7 +137,6 @@ const ChatPage: React.FC = () => {
         }),
       });
       if (prompt.directory.includes("https://github.com")) {
-        // Handle GitHub case: prompt the user to download the file
         const blob = await response.blob();
         const downloadUrl = window.URL.createObjectURL(blob);
         const a = document.createElement("a");
@@ -146,7 +147,6 @@ const ChatPage: React.FC = () => {
         document.body.removeChild(a);
         window.URL.revokeObjectURL(downloadUrl);
       } else {
-        // Handle local directory case
         alert("Readme file created successfully!");
       }
       const response1 = await fetch(`/api/deletejson`, {
@@ -177,6 +177,7 @@ const ChatPage: React.FC = () => {
       purpose: "",
       directory: "",
       contribute:"",
+      features:"",
     });
   };
 
