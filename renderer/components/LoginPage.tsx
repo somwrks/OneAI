@@ -24,10 +24,10 @@ export default function LoginPage() {
       </div>
         <div className="flex  bringin  rounded-lg z-0 shadow-md shadow-gray-700 space-y-3 p-3  flex-col absolute top-[10vw] left-[50vw]  bg-gradient-to-tl from-gray-900 to-black">
         <div className="flex text-center text-3xl flex-col">        <AnimatedText speed={60} text={content[1].title} /></div>
-          <div className="flex font-mono flex-col text-blue-500">        <AnimatedText speed={15} text={content[1].content} /></div>     </div>
+          <div className="flex font-mono flex-col text-blue-500">        <AnimatedText speed={10} text={content[1].content} /></div>     </div>
         <div className="flex  bringin  rounded-lg  shadow-md shadow-gray-700 space-y-3 p-3  flex-col absolute top-[10vw] left-[78vw]  bg-black  bg-gradient-to-t from-gray-900 to-black">
         <div className="flex text-center text-3xl flex-col">        <AnimatedText speed={60} text={content[2].title} /></div>
-          <div className="flex font-mono flex-col text-green-500">        <AnimatedText speed={20} text={content[2].content} /></div>    </div>
+          <div className="flex font-mono flex-col text-green-500">        <AnimatedText speed={10} text={content[2].content} /></div>    </div>
       
       <div className="flex  z-50 shadow-lg fade backdrop-blur-sm font-poppins flex-col w-full   min-h-screen items-center  justify-center">
         <div className="flex flex-col bg-black bg-opacity-20 rounded-full backdrop-blur-xl w-1/2 h-96 justify-center gap-y-5 p-5">
