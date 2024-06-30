@@ -67,7 +67,7 @@ const TemplateDisplay: React.FC<TemplateDisplayProps> = ({
                   <div className="flex text-2xl">{text.title}</div>
                   <div className="flex text-md border text-gray-300 border-gray-600 p-4">
                     <p style={{ whiteSpace: "pre-wrap" }}>
-                      {condition ? <AnimatedText text={description} /> : description}
+                      {condition ? <AnimatedText speed={10} text={description} /> : description}
                     </p>
                   </div>
                   <div className="flex flex-col space-y-12 items-end w-full">

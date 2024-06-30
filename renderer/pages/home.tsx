@@ -10,7 +10,7 @@ export default function HomePage() {
       <Head>
         <title>OneAI</title>
       </Head>
-    <div className="flex font-mono flex-col w-full min-h-screen  p-5">
+    <div className="flex font-poppins  flex-col w-full min-h-screen  p-5">
       <div>
         <h1 className='text-5xl font-bold text-center'>OneAI - Project Readme Generator</h1>
       </div>

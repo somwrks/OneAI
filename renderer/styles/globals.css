@@ -2,35 +2,61 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  body {
-    @apply bg-gray-900 text-white;
+body{
+  background: black;
+  color: white;
+}
+
+*{
+ overflow: hidden;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+.fade{
+  animation: fade 1s ease-in-out;
+}
+
+.bringin:nth-child(1) {
+  animation: bringin 0.5s ease-in-out, fade 1s ease-in-out;
+  height: 80vw;
+  width: 35vw;
+  transform: scaleY(100%) rotate(-45deg);
+}
+.bringin:nth-child(2) {
+  animation: bringin 0.7s ease-in-out, fade 1.5s ease-in-out;
+  height: 80vw;
+  width: 35vw;
+  transform: scaleY(100%) rotate(-45deg);
+}
+.bringin:nth-child(3) {
+  animation: bringin 0.9s ease-in-out, fade 2s ease-in-out;
+  height: 80vw;
+  width: 35vw;
+  transform: scaleY(100%) rotate(-45deg);
+}
+.bringin:nth-child(4) {
+  animation: bringin 0.9s ease-in-out, fade 2s ease-in-out;
+  height: 80vw;
+  width: 35vw;
+  transform: scaleY(100%) rotate(-45deg);
+}
+
+
+@keyframes bringin {
+  0% {
+    transform: scaleY(0%) rotate(0deg);
+  }
+  100% {
+    transform: scaleY(100%) rotate(-45deg);
   }
 }
 
-@layer components {
-  .btn-blue {
-    @apply text-white font-bold px-4 py-2 rounded bg-blue-600 hover:bg-blue-500;
+@keyframes fade {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
   }
 }
-.display{ display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;}
-
-  @keyframes typing {
-    from { width: 0; }
-    to { width: 100%; }
-  }
-  
-  @keyframes blink-caret {
-    from, to { border-color: transparent; }
-    50% { border-color: black; }
-  }
-  
-  .typing-animation {
-    overflow: hidden;
-    border-right: .15em solid black;
-    white-space: nowrap;
-    animation: typing 3.5s steps(40, end), blink-caret .75s step-end infinite;
-  }
