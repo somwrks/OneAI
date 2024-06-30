@@ -150,9 +150,9 @@ const PromptForm: React.FC<PromptFormProps> = ({ prompt, setPrompt, setStart }) 
             value={prompt.type}
             onChange={(e) => setPrompt({ ...prompt, type: e.target.value })}
           >
-            <option value="" disabled>Select Type of Project</option>
-            <option value="Website">Website</option>
-            <option value="Mobile_App">Mobile App</option>
+            <option className="p-2 bg-gray-700 w-2/3" value="" disabled>Select Type of Project</option>
+            <option className="p-2 bg-gray-700 w-2/3" value="Website">Website</option>
+            <option className="p-2 bg-gray-700 w-2/3" value="Mobile_App">Mobile App</option>
           </select>
         );
       case 2:
@@ -162,9 +162,9 @@ const PromptForm: React.FC<PromptFormProps> = ({ prompt, setPrompt, setStart }) 
             value={frontend}
             onChange={(e) => setFrontend(e.target.value)}
           >
-            <option value="" disabled>Select Frontend</option>
+            <option  value="" disabled>Select Frontend</option>
             {frontendOptions[prompt.type]?.map((option) => (
-              <option key={option} value={option}>{option}</option>
+              <option className="p-2 bg-gray-700 w-2/3" key={option} value={option}>{option}</option>
             ))}
           </select>
         );
@@ -177,7 +177,7 @@ const PromptForm: React.FC<PromptFormProps> = ({ prompt, setPrompt, setStart }) 
           >
             <option value="" disabled>Select Backend</option>
             {backendOptions[prompt.type]?.map((option) => (
-              <option key={option} value={option}>{option}</option>
+              <option className="p-2 bg-gray-700 w-2/3" key={option} value={option}>{option}</option>
             ))}
           </select>
         );
@@ -190,7 +190,7 @@ const PromptForm: React.FC<PromptFormProps> = ({ prompt, setPrompt, setStart }) 
           >
             <option value="" disabled>Select Database</option>
             {databaseOptions[prompt.type]?.map((option) => (
-              <option key={option} value={option}>{option}</option>
+              <option className="p-2 bg-gray-700 w-2/3" key={option} value={option}>{option}</option>
             ))}
           </select>
         );
