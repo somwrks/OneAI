@@ -1,6 +1,6 @@
-![image](https://github.com/somwrks/OneAI/assets/85481905/eb2b22c7-b074-4b51-88d9-a0a69c64ac00)
-![image](https://github.com/somwrks/OneAI/assets/85481905/a3d80b79-6a2c-4acc-ad79-ed74b905aa1f)
-![image](https://github.com/somwrks/OneAI/assets/85481905/8c7cefc5-ab0e-4083-b038-ec7d4fd710b6)
+![image](https://github.com/somwrks/OneAI/assets/85481905/f6e32dd3-f85f-4acc-9614-742af14aa5ad)
+![image](https://github.com/somwrks/OneAI/assets/85481905/e95755fd-cc98-4dbd-bdbb-bc7c478d0595)
+
 ![image](https://github.com/somwrks/OneAI/assets/85481905/2bccd5d8-dd0f-4e7c-8e5f-a414d31ccc5a)
 ![image](https://github.com/somwrks/OneAI/assets/85481905/6fffb256-b5fe-4523-aa23-fc07d2c297b6)
 ![image](https://github.com/somwrks/OneAI/assets/85481905/db18e542-0c62-415c-8baa-b45ca2109bca)
