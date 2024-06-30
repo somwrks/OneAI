@@ -20,17 +20,17 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
   return (
     <>
       <select
-        className="bg-gray-700 w-2/3 p-3"
+        className="p-2 bg-white bg-opacity-20 w-2/3"
         value={selectedModel}
         onChange={handleModelChange}
       >
-        <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
-        <option value="gemini-1.5-flash">gemini-1.5-flash</option>
-        <option value="llama3-70b">llama3-70b</option>
-        <option value="claude-3-5-sonnet-20240620">Claude</option>
+        <option className="p-2 bg-gray-700 w-2/3" value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+        <option className="p-2 bg-gray-700 w-2/3"  value="gemini-1.5-flash">gemini-1.5-flash</option>
+        <option className="p-2 bg-gray-700 w-2/3" value="llama3-70b">llama3-70b</option>
+        <option className="p-2 bg-gray-700 w-2/3" value="claude-3-5-sonnet-20240620">Claude</option>
       </select>
       <input
-        className="bg-gray-700 w-2/3 p-3"
+        className="p-2 bg-white bg-opacity-20 w-2/3"
         type="text"
         placeholder="Enter API KEY"
         value={apiKey}

@@ -4,7 +4,6 @@ import ModelSelector from "./ModelSelector";
 import PromptForm from "./PromptForm";
 import TemplateDisplay from "./TemplateDisplay";
 import LoadingOverlay from "./LoadingOverlay";
-import { SignOutButton } from "@clerk/clerk-react";
 import { Prompt, ReadmeData } from "./types";
 
 const initialReadme: ReadmeData[] = [
@@ -260,7 +259,7 @@ const ChatPage: React.FC = () => {
   return (
     <div>
       {loading && <LoadingOverlay />}
-      <div className="flex flex-col w-full items-center h-full gap-5 p-5">
+      <div className="flex flex-col fade w-full items-center h-full gap-5 p-5">
         <ModelSelector
           selectedModel={selectedModel}
           handleModelChange={handleModelChange}
@@ -269,7 +268,7 @@ const ChatPage: React.FC = () => {
           generate={generate}
           regenerate={regenerate}
         />
-        <div className="flex flex-col w-2/3 items-center gap-y-5">
+        <div className="flex  flex-col w-2/3 items-center gap-y-5">
           {start ? (
             !save ? (
               <TemplateDisplay
@@ -294,9 +293,7 @@ const ChatPage: React.FC = () => {
             <PromptForm prompt={prompt} setPrompt={setPrompt} setStart={setStart} />
           )}
         </div>
-        <div className="flex p-2 bg-gray-400 flex-col w-1/2 ">
-          <SignOutButton />
-        </div>
+
       </div>
     </div>
   );

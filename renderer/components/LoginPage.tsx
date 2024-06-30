@@ -1,8 +1,18 @@
-import { SignInButton } from '@clerk/clerk-react'
+import { SignInButton, useUser } from '@clerk/clerk-react'
 import React, { useEffect, useState } from 'react';
 import AnimatedText from "./AnimatedText";
+import { useRouter } from 'next/router';
 
 export default function LoginPage() {
+    const { user, isLoaded } = useUser();
+    const router = useRouter();
+  
+    // Redirect to the /home page if the user is signed in
+    React.useEffect(() => {
+      if (isLoaded && user) {
+        router.push('/home');
+      }
+    }, [isLoaded, user, router]);
     const content = [
         {title: "React",
             content: `# Project Name\n\n## Overview\nProject Name is a comprehensive full-stack application built with React, Node.js, Express, and MongoDB. This project aims to provide a seamless and robust web application experience, combining the latest in frontend and backend technologies.\n\n## Table of Contents\n1. [Introduction](#introduction)\n2. [Features](#features)\n3. [Tech Stack](#tech-stack)\n4. [Installation](#installation)\n5. [Usage](#usage)\n6. [Configuration](#configuration)\n7. [Scripts](#scripts)\n8. [API Documentation](#api-documentation)\n9. [Contributing](#contributing)\n10. [License](#license)\n11. [Contact](#contact)\n\n## Introduction\nWelcome to Project Name!`
@@ -11,7 +21,7 @@ export default function LoginPage() {
             content: `# MobileApp: React Native Application\n\n## Overview\n\nMobileApp is a cutting-edge mobile application developed by [Startup Name] using React Native. This cross-platform solution provides a native app experience for both iOS and Android devices, offering seamless performance and a unified codebase.\n\n## Table of Contents\n\n- [Features](#features)\n- [Technologies](#technologies)\n- [Getting Started](#getting-started)\n  - [Prerequisites](#prerequisites)\n  - [Installation](#installation)\n- [Usage](#usage)\n- [API Integration](#api-integration)\n- [Contributing](#contributing)\n- [Testing](#testing)\n- [Deployment](#deployment)\n- [License]`
         },
         {title: "Flask",
-            content: `  # FlaskAPI: RESTful API Service\n\n## Overview\n\nFlaskAPI is a robust and scalable RESTful API service developed by [Startup Name] using Flask, a lightweight WSGI web application framework in Python. This API serves as the backend for our various client applications, providing efficient data management and business logic implementation.\n\n## Table of Contents\n\n- [Features](#features)\n- [Technologies](#technologies)\n- [Getting Started](#getting-started)\n  - [Prerequisites](#prerequisites)\n  - [Installation](#installation)\n- [Usage](#usage)\n- [API Documentation](#api-documentation)\n- [Database](#database)\n- [Testing](#testing)\n- [Deployment](#deployment)\n- [Contributing](#contributing)\n- [License](#license) `
+            content: `# FlaskAPI: RESTful API Service\n\n## Overview\n\nFlaskAPI is a robust and scalable RESTful API service developed by [Startup Name] using Flask, a lightweight WSGI web application framework in Python. This API serves as the backend for our various client applications, providing efficient data management and business logic implementation.\n\n## Table of Contents\n\n- [Features](#features)\n- [Technologies](#technologies)\n- [Getting Started](#getting-started)\n  - [Prerequisites](#prerequisites)\n  - [Installation](#installation)\n- [Usage](#usage)\n- [API Documentation](#api-documentation)\n- [Database](#database)\n- [Testing](#testing)\n- [Deployment](#deployment)\n- [Contributing](#contributing)\n- [License](#license) `
         },
     ]
     
