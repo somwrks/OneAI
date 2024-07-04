@@ -51,13 +51,13 @@ export default function LoginPage() {
                   </div>
               </div>
               <div className="flex z-50 flex-col w-full items-center">
-                  <button className='p-3 transition-all font-bold shadow-gray-600 shadow-md hover:bg-white hover:text-black border w-1/3 text-center text-md rounded-2xl'>
+                  <div className='p-3 transition-all font-bold shadow-gray-600 shadow-md hover:bg-white hover:text-black border w-1/3 text-center text-md rounded-2xl'>
                       <SignInButton>
 
                           GET STARTED
                       </SignInButton>
 
-                  </button>
+                  </div>
               </div>
         </div>
           </div></>

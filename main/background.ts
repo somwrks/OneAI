@@ -8,7 +8,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const isProd = process.env.NODE_ENV === 'production';
-
+console.log(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY)
+console.log(process.env.CLERK_SECRET_KEY)
 if (isProd) {
   serve({ directory: 'app' });
 } else {

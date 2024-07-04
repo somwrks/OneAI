@@ -1,6 +1,6 @@
 appId: com.example.nextron
-productName: My Nextron App
-copyright: Copyright © 2018 Yoshihide Shiono
+productName: OneAI
+copyright: Copyright © 2024 somwrks
 directories:
   output: dist
   buildResources: resources

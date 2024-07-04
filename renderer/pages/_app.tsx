@@ -12,7 +12,6 @@ import LoginPage from '../components/LoginPage';
 import Navbar from '../components/Navbar';
 
 function MyApp({ Component, pageProps }: AppProps) {
-  
 return(
    <ClerkProvider publishableKey='pk_test_dW5pcXVlLWdvYmxpbi04Mi5jbGVyay5hY2NvdW50cy5kZXYk' >
       <SignedOut>
